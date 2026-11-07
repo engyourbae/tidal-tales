@@ -1,0 +1,22 @@
+category,id,name,tier,cast_power,control,line_strength,reel_speed,reel_speed_bonus,drag_bonus,strength_kg,visibility,hook_bonus,fish_size,attracts,habitat,price,unlock_level,look
+rods,rod_wood,Willow Starter,Starter,25,25,25,20,,,,,,,,,0,1,"joran kayu sederhana, gagang cork"
+rods,rod_bamboo,Bamboo Stream,Common,38,42,35,32,,,,,,,,,350,2,"bambu hijau, lilitan benang"
+rods,rod_carbon,Carbon Runner,Rare,58,55,60,55,,,,,,,,,1800,6,"serat karbon hitam-biru, reel metal"
+rods,rod_tide,Tidebreaker,Epic,72,70,76,68,,,,,,,,,6500,12,biru laut dengan aksen perak
+rods,rod_abyss,Abyss Sovereign,Legendary,90,88,92,84,,,,,,,,,18000,20,"hitam obsidian, garis cyan bercahaya"
+reels,reel_basic,Spool Mini,,,,,,0,0,,,,,,,0,,
+reels,reel_smooth,Smooth Drag,,,,,,8,10,,,,,,,600,,
+reels,reel_pro,Ocean Pro,,,,,,16,22,,,,,,,2800,,
+reels,reel_abyss,Abyss Gear,,,,,,25,35,,,,,,,9000,,
+lines,line_2kg,Monofilament 2kg,,,,,,,,2,0.8,,,,,0,,
+lines,line_8kg,Nylon 8kg,,,,,,,,8,0.7,,,,,180,,
+lines,line_25kg,Braided 25kg,,,,,,,,25,0.55,,,,,900,,
+lines,line_80kg,Deep Sea 80kg,,,,,,,,80,0.6,,,,,3200,,
+hooks,hook_small,Small Hook,,,,,,,,,,8,small,,,0,,
+hooks,hook_universal,Universal Hook,,,,,,,,,,12,small-medium,,,250,,
+hooks,hook_big,Big Game Hook,,,,,,,,,,18,medium-large,,,850,,
+baits,bait_worm,Cacing Tanah,,,,,,,,,,,,Common;Uncommon,Willow Lake;Misty River,5,,
+baits,bait_shrimp,Udang Kecil,,,,,,,,,,,,Uncommon;Rare,Coral Bay;Mangrove Marsh,15,,
+baits,bait_glow,Glow Larva,,,,,,,,,,,,Rare;Epic,Abyssal Trench;Mangrove Marsh,35,,
+baits,bait_moon,Moon Pearl Bait,,,,,,,,,,,,Epic;Legendary;Mythic,Willow Lake;Abyssal Trench,120,,
+baits,bait_lure,Flash Minnow Lure,,,,,,,,,,,,Rare;Epic,Coral Bay,55,,

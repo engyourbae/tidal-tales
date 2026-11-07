@@ -1,0 +1,14 @@
+id,parent,order,label,action,param,dock,desc
+m_play,home,1,MAIN,play,,0,Kembali memancing
+m_shop,home,2,TOKO,shop,rods,1,Beli joran reel senar kail dan umpan
+m_bag,home,3,TAS IKAN,shop,sell,1,Jual atau pamerkan ikan simpananmu
+m_aqua,home,4,AKUARIUM,aqua,,1,Lihat ikan simpananmu berenang
+m_dex,home,5,INDEKS,dex,,1,Koleksi spesies dan mutasi
+m_loc,home,6,LOKASI,locs,,1,Pilih tempat memancing
+m_set,home,7,PENGATURAN,opts,,1,Suara musik cuaca dan kode redeem
+t_rods,shop,1,Joran,,rods,0,
+t_reels,shop,2,Reel,,reels,0,
+t_lines,shop,3,Senar,,lines,0,
+t_hooks,shop,4,Kail,,hooks,0,
+t_baits,shop,5,Umpan,,baits,0,
+t_sell,shop,6,Tas Ikan,,sell,0,
