@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101a2b"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<title>Tidal Tales: Fishing Adventure</title></head>
+<body><div id="app">
+<canvas id="cv" width="960" height="540"></canvas>
+<div id="top"><span id="coins"></span><span id="lvl"></span><span id="loc"></span><button id="menuBtn">MENU</button></div>
+<div id="msg" hidden></div>
+<div id="hud">
+ <div id="gauges">
+  <div class="g"><label id="gl1">POWER</label><div class="bar"><i id="f1"></i></div></div>
+  <div class="g"><label>TEGANGAN SENAR</label><div class="bar"><i id="f2"></i><b class="zone"></b></div></div>
+  <div class="g"><label>STAMINA IKAN</label><div class="bar"><i id="f3" class="sta"></i></div></div>
+ </div>
+ <div id="acts"><button id="bCast">CAST</button><button id="bStrike">STRIKE</button><button id="bReel">REEL</button><button id="bPump">PUMP</button></div>
+</div>
+<div id="modal" hidden></div>
+</div><script type="module" src="/src/main.js"></script></body></html>
