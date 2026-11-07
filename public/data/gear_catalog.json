@@ -1,0 +1,214 @@
+{
+  "rods": [
+    {
+      "id": "rod_wood",
+      "name": "Willow Starter",
+      "tier": "Starter",
+      "cast_power": 25,
+      "control": 25,
+      "line_strength": 25,
+      "reel_speed": 20,
+      "price": 0,
+      "unlock_level": 1,
+      "look": "joran kayu sederhana, gagang cork"
+    },
+    {
+      "id": "rod_bamboo",
+      "name": "Bamboo Stream",
+      "tier": "Common",
+      "cast_power": 38,
+      "control": 42,
+      "line_strength": 35,
+      "reel_speed": 32,
+      "price": 350,
+      "unlock_level": 2,
+      "look": "bambu hijau, lilitan benang"
+    },
+    {
+      "id": "rod_carbon",
+      "name": "Carbon Runner",
+      "tier": "Rare",
+      "cast_power": 58,
+      "control": 55,
+      "line_strength": 60,
+      "reel_speed": 55,
+      "price": 1800,
+      "unlock_level": 6,
+      "look": "serat karbon hitam-biru, reel metal"
+    },
+    {
+      "id": "rod_tide",
+      "name": "Tidebreaker",
+      "tier": "Epic",
+      "cast_power": 72,
+      "control": 70,
+      "line_strength": 76,
+      "reel_speed": 68,
+      "price": 6500,
+      "unlock_level": 12,
+      "look": "biru laut dengan aksen perak"
+    },
+    {
+      "id": "rod_abyss",
+      "name": "Abyss Sovereign",
+      "tier": "Legendary",
+      "cast_power": 90,
+      "control": 88,
+      "line_strength": 92,
+      "reel_speed": 84,
+      "price": 18000,
+      "unlock_level": 20,
+      "look": "hitam obsidian, garis cyan bercahaya"
+    }
+  ],
+  "reels": [
+    {
+      "id": "reel_basic",
+      "name": "Spool Mini",
+      "reel_speed_bonus": 0,
+      "drag_bonus": 0,
+      "price": 0
+    },
+    {
+      "id": "reel_smooth",
+      "name": "Smooth Drag",
+      "reel_speed_bonus": 8,
+      "drag_bonus": 10,
+      "price": 600
+    },
+    {
+      "id": "reel_pro",
+      "name": "Ocean Pro",
+      "reel_speed_bonus": 16,
+      "drag_bonus": 22,
+      "price": 2800
+    },
+    {
+      "id": "reel_abyss",
+      "name": "Abyss Gear",
+      "reel_speed_bonus": 25,
+      "drag_bonus": 35,
+      "price": 9000
+    }
+  ],
+  "lines": [
+    {
+      "id": "line_2kg",
+      "name": "Monofilament 2kg",
+      "strength_kg": 2,
+      "visibility": 0.8,
+      "price": 0
+    },
+    {
+      "id": "line_8kg",
+      "name": "Nylon 8kg",
+      "strength_kg": 8,
+      "visibility": 0.7,
+      "price": 180
+    },
+    {
+      "id": "line_25kg",
+      "name": "Braided 25kg",
+      "strength_kg": 25,
+      "visibility": 0.55,
+      "price": 900
+    },
+    {
+      "id": "line_80kg",
+      "name": "Deep Sea 80kg",
+      "strength_kg": 80,
+      "visibility": 0.6,
+      "price": 3200
+    }
+  ],
+  "hooks": [
+    {
+      "id": "hook_small",
+      "name": "Small Hook",
+      "fish_size": "small",
+      "hook_bonus": 8,
+      "price": 0
+    },
+    {
+      "id": "hook_universal",
+      "name": "Universal Hook",
+      "fish_size": "small-medium",
+      "hook_bonus": 12,
+      "price": 250
+    },
+    {
+      "id": "hook_big",
+      "name": "Big Game Hook",
+      "fish_size": "medium-large",
+      "hook_bonus": 18,
+      "price": 850
+    }
+  ],
+  "baits": [
+    {
+      "id": "bait_worm",
+      "name": "Cacing Tanah",
+      "attracts": [
+        "Common",
+        "Uncommon"
+      ],
+      "habitat": [
+        "Willow Lake",
+        "Misty River"
+      ],
+      "price": 5
+    },
+    {
+      "id": "bait_shrimp",
+      "name": "Udang Kecil",
+      "attracts": [
+        "Uncommon",
+        "Rare"
+      ],
+      "habitat": [
+        "Coral Bay",
+        "Mangrove Marsh"
+      ],
+      "price": 15
+    },
+    {
+      "id": "bait_glow",
+      "name": "Glow Larva",
+      "attracts": [
+        "Rare",
+        "Epic"
+      ],
+      "habitat": [
+        "Abyssal Trench",
+        "Mangrove Marsh"
+      ],
+      "price": 35
+    },
+    {
+      "id": "bait_moon",
+      "name": "Moon Pearl Bait",
+      "attracts": [
+        "Epic",
+        "Legendary",
+        "Mythic"
+      ],
+      "habitat": [
+        "Willow Lake",
+        "Abyssal Trench"
+      ],
+      "price": 120
+    },
+    {
+      "id": "bait_lure",
+      "name": "Flash Minnow Lure",
+      "attracts": [
+        "Rare",
+        "Epic"
+      ],
+      "habitat": [
+        "Coral Bay"
+      ],
+      "price": 55
+    }
+  ]
+}

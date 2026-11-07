@@ -1,1 +1,31 @@
-
+﻿id,name,rarity,habitat,size_class,behavior,visual_brief,reference_weight_kg,base_value
+fish_01,Pipit Pond Minnow,Common,Willow Lake,kecil,Lambat,Perak dengan garis biru; schooling fish,0.25,12
+fish_02,Lele Lumpur,Common,Willow Lake; Mangrove Marsh,kecil,Dasar air,"Kumis panjang, cokelat gelap",0.8,20
+fish_03,Nila Biru,Common,Willow Lake,kecil-sedang,Sedang,Badan pipih biru kehijauan,1.2,24
+fish_04,Mujair Batu,Common,Willow Lake; Misty River,kecil-sedang,Sedang,Sirip punggung bergerigi,1.0,22
+fish_05,Wader Perak,Common,Misty River,kecil,Cepat,"Kilau perak, berenang bergerombol",0.2,16
+fish_06,Gabus Rawa,Uncommon,Mangrove Marsh,sedang,Agresif,"Kepala lebar, pola loreng rawa",2.5,65
+fish_07,Patin Sungai,Uncommon,Misty River,sedang-besar,Tarikan kuat,"Tubuh licin, sungut pendek",4.0,78
+fish_08,Koi Senja,Rare,Willow Lake,sedang,Lincah,Oranye-putih dengan pola awan,3.0,160
+fish_09,Arwana Merah,Epic,Mangrove Marsh; Coral Bay,besar,Lincah,"Sisik merah metalik, kumis pendek",5.0,520
+fish_10,Toman Raja,Epic,Mangrove Marsh,besar,Sangat agresif,Predator loreng dengan rahang kuat,9.0,600
+fish_11,Barracuda Kilat,Rare,Coral Bay,besar,Sangat cepat,Tubuh torpedo dan garis neon,7.0,230
+fish_12,Clownfish Karang,Common,Coral Bay,kecil,Lincah,Oranye dengan tiga pita putih,0.3,25
+fish_13,Parrotfish Zamrud,Uncommon,Coral Bay,sedang,Sedang,"Mulut seperti paruh, hijau-biru",2.0,95
+fish_14,Lionfish,Rare,Coral Bay,sedang,Mengambang,Sirip kipas lebar berpola garis,1.5,210
+fish_15,Manta Muda,Epic,Coral Bay,besar,Meluncur,Siluet pipih dengan ujung sayap bercahaya,18.0,700
+fish_16,Tuna Sirip Biru,Legendary,Coral Bay,besar,Tarikan ekstrem,"Badan kuat, sirip biru metalik",35.0,1500
+fish_17,Hiu Karang,Epic,Coral Bay,besar,Predator,Abu-abu dengan bekas luka kecil,28.0,780
+fish_18,Belut Neon,Rare,Mangrove Marsh; Abyssal Trench,sedang,Meliuk,Garis bioluminesen cyan,1.8,260
+fish_19,Angler Lantern,Legendary,Abyssal Trench,sedang,Gerak lambat,Umpan cahaya di kepala,12.0,2100
+fish_20,Gurita Kaca,Epic,Abyssal Trench,sedang,Menghindar,Tubuh transparan kebiruan,6.0,900
+fish_21,Naga Laut Safir,Legendary,Abyssal Trench,besar,Anggun,"Sirip seperti pita, sisik safir",14.0,2500
+fish_22,Leviathan Kecil,Mythic,Abyssal Trench,raksasa,Boss fight,"Makhluk laut purba, mata bercahaya",250.0,12000
+fish_23,Koi Bulan,Mythic,Willow Lake (malam),sedang,Anggun,"Putih mutiara, pola bulan bercahaya",8.0,9000
+fish_24,Phoenix Fin,Mythic,Coral Bay (senja),besar,Meledak cepat,Sirip merah-emas seperti bara,22.0,14000
+fish_25,Ikan Kristal,Epic,Abyssal Trench,kecil-sedang,Rapuh,"Tubuh kristal bersegi, refraksi warna",1.0,1100
+fish_26,Belida Pisau,Uncommon,Misty River,sedang,Mundur-maju,Tubuh panjang pipih seperti pisau,1.7,80
+fish_27,Sidat Rawa,Rare,Mangrove Marsh,sedang,Meliuk kuat,"Kulit licin, pola zaitun",2.8,240
+fish_28,Kakap Merah,Uncommon,Coral Bay,sedang,Tarikan sedang,Merah-oranye dengan sisik tegas,3.2,125
+fish_29,Marlin Biru,Legendary,Coral Bay,raksasa,Lompatan tinggi,"Paruh panjang, sirip punggung tinggi",90.0,3200
+fish_30,Paus Bintang,Mythic,Abyssal Trench (event),raksasa,Event boss,Siluet paus dengan pola galaksi,1200.0,25000
