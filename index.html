@@ -6,15 +6,19 @@
 <body><div id="app">
 <canvas id="cv" width="960" height="540"></canvas>
 <div id="top"><span id="coins"></span><span id="lvl"></span><span id="loc"></span><button id="menuBtn">MENU</button></div>
+<div id="dock" hidden></div>
 <div id="msg" hidden></div>
+<div id="swipe" hidden><div id="swa"></div><div id="swt"></div><div class="bar"><i id="swb"></i></div></div>
 <div id="hud">
  <div id="gauges" hidden>
   <div class="g" id="g1"><label id="gl1">POWER LEMPAR</label><div class="bar"><i id="f1"></i></div></div>
-  <div class="g" id="g2"><label id="gl2">TEGANGAN SENAR</label><div class="bar"><i id="f2"></i><b class="zone"></b></div></div>
-  <div class="g" id="g3"><label>STAMINA IKAN</label><div class="bar"><i id="f3" class="sta"></i></div></div>
+  <div class="g" id="g2"><label id="gl2">PROGRESS TANGKAP</label><div class="bar"><i id="f2"></i></div></div>
+  <div class="g" id="g3"><label id="gl3">ENERGI TAP</label><div class="bar"><i id="f3" class="sta"></i></div></div>
  </div>
- <div id="acts"><button id="bCast">CAST</button><button id="bStrike">STRIKE</button><button id="bReel">REEL</button><button id="bPump">PUMP</button></div>
+ <div id="acts"><button id="bCast">CAST</button><button id="bStrike">STRIKE</button><button id="bReel">TAP</button></div>
 </div>
+<div id="flexui" hidden><button id="bPhoto">SIMPAN FOTO</button><button id="bBack">KEMBALI</button></div>
+<div id="aqui" hidden></div>
 <div id="banner" hidden></div>
 <div id="cut"></div>
 <div id="modal" hidden></div>
