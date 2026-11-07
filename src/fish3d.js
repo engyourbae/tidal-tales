@@ -13,12 +13,12 @@ const bodyGeo=seg=>{const g=new THREE.SphereGeometry(1,seg[0],seg[1]),p=g.attrib
 export function makeFish(f,dark=false,mut=null){
  const g=new THREE.Group(),sh=hash(f.id),n=f.name.toLowerCase(),br=f.visual_brief.toLowerCase(),rar=RN.indexOf(f.rarity),glow=!dark&&(rar>=3||!!mut),tr=/kaca|kristal/.test(n);
  const col=dark?'#1b2433':mut?mut.col:colorOf(f),acc=dark?'#1b2433':ACC[sh%4],fin=dark?'#1b2433':new THREE.Color(col).multiplyScalar(.82);
- const mt=(c,e=0)=>new THREE.MeshStandardMaterial({color:c,roughness:.5,metalness:.1,flatShading:true,side:THREE.DoubleSide,transparent:tr&&!dark,opacity:tr&&!dark?.7:1,emissive:mut?mut.em:glow?RC[f.rarity]:'#000000',emissiveIntensity:mut?(e?mut.ei:0):glow?e:0});
+ const mt=(c,e=0)=>{const m=new THREE.MeshStandardMaterial({color:c,roughness:.5,metalness:.1,flatShading:true,side:THREE.DoubleSide,transparent:tr&&!dark,opacity:tr&&!dark?.7:1,emissive:mut?mut.em:glow?RC[f.rarity]:'#000000',emissiveIntensity:mut?(e?mut.ei:0):glow?e:0});m.userData.e0=m.emissiveIntensity;u.mats.push(m);return m};
  const kind=/manta/.test(n)?'ray':/gurita/.test(n)?'octo':/belut|sidat|naga|leviathan/.test(n)?'eel':/paus/.test(n)?'whale':/hiu/.test(n)?'shark':/marlin|barracuda|tuna|toman|belida|arwana/.test(n)?'torp':/lele|patin|gabus/.test(n)?'cat':'fish';
  const D={fish:[.5,.21,.1],torp:[.5,.13,.09],eel:[.5,.05,.05],ray:[.32,.04,.3],octo:[.22,.22,.22],whale:[.5,.2,.17],shark:[.5,.14,.12],cat:[.5,.13,.14]}[kind];
  const sp=(w=10,hh=7)=>new THREE.SphereGeometry(1,w,hh),seg=/kristal/.test(n)?[5,4]:[12,9];
  const add=(geo,m,x,y,z,sx=1,sy=1,sz=1,p=g)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);p.add(o);return o};
- const u=g.userData={tails:[],fins:[],fr:.7,fa:.25},sy=kind==='fish'||kind==='cat'?D[1]/.2:Math.max(.35,D[1]/.13*.9),sc=pts=>pts.map(p=>[p[0],p[1]*sy]);
+ const u=g.userData={tails:[],fins:[],fr:.7,fa:.25,mats:[]},sy=kind==='fish'||kind==='cat'?D[1]/.2:Math.max(.35,D[1]/.13*.9),sc=pts=>pts.map(p=>[p[0],p[1]*sy]);
  add(kind==='octo'||kind==='ray'?sp(...seg):bodyGeo(seg),mt(col,.3),0,0,0,...D);
  const T=(pts,ax='y',rx=false)=>{const p=new THREE.Group();p.position.set(-D[0]*.9,0,0);g.add(p);add(shp(pts,rx),mt(sh%3?fin:acc,.3),0,0,0,1,1,1,p);u.tails.push({p,ph:0,ax})};
  const dors=(pts,x=0)=>add(shp(pts),mt(fin,.3),x,D[1]*.8,0);
@@ -59,5 +59,5 @@ let vr,vs,vc,vm,vraf=0;
 export function startViewer(f){stopViewer();
  if(!vr){vr=new THREE.WebGLRenderer({antialias:true,alpha:true});vr.setPixelRatio(Math.min(devicePixelRatio||1,2));vr.setSize(300,150);vs=new THREE.Scene();vs.add(new THREE.HemisphereLight('#ffffff','#667788',1.6));const d=new THREE.DirectionalLight('#ffffff',2);d.position.set(1,2,3);vs.add(d);vc=new THREE.PerspectiveCamera(30,2,.1,20);vc.position.set(0,.2,2.6);vc.lookAt(0,0,0);vr.domElement.style.cssText='width:100%;height:auto;display:block'}
  vm=makeFish(f,false,f.mut);vs.add(vm);const t0=performance.now();
- const tick=()=>{const t=(performance.now()-t0)/1000;vm.rotation.y=Math.sin(t*.8)*.7-.3;vm.position.y=Math.sin(t*1.6)*.04;vm.rotation.z=Math.sin(t*1.1)*.05;animateFish(vm,t,.45);vr.render(vs,vc);vraf=requestAnimationFrame(tick)};tick();return vr.domElement}
+ const tick=()=>{const t=(performance.now()-t0)/1000;vm.rotation.y=Math.sin(t*.8)*.7-.3;vm.position.y=Math.sin(t*1.6)*.04;vm.rotation.z=Math.sin(t*1.1)*.05;animateFish(vm,t,.45);vm.userData.mats.forEach(m=>{m.emissiveIntensity=m.userData.e0*(1+.5*Math.sin(t*4))});vr.render(vs,vc);vraf=requestAnimationFrame(tick)};tick();return vr.domElement}
 export function stopViewer(){cancelAnimationFrame(vraf);if(vm&&vs){vs.remove(vm);vm=null}}
