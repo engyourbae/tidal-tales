@@ -61,3 +61,23 @@ button:disabled{filter:grayscale(.6);opacity:.55}
 @media (max-height:560px){#dock{display:grid;grid-template-columns:repeat(2,90px)}#dock[hidden]{display:none}}
 #aqui{background:#153b78;border:3px solid #0d2a57;box-shadow:inset 3px 3px 0 #3f78c8}#aqui p{background:#0f2a50;padding:6px 10px;border-radius:6px}
 #gauges,#swipe{background:#153b78;border:3px solid #0d2a57;box-shadow:inset 3px 3px 0 #3f78c8}
+
+/* ===== jelajah sungai, joystick, akuarium besar ===== */
+#joy{position:absolute;left:18px;bottom:104px;width:128px;height:128px;border-radius:50%;background:#0f2a50aa;border:4px solid #1b4a86;display:flex;align-items:center;justify-content:center;touch-action:none;box-shadow:inset 0 0 0 6px #ffffff14,0 4px 0 #0d2a57}
+#joy[hidden],#rideui[hidden],#aqlab[hidden]{display:none}
+#joyk{display:block;width:54px;height:54px;border-radius:50%;background:#e9b52f;box-shadow:inset 3px 3px 0 #ffe08a,inset -3px -4px 0 #9a7314;pointer-events:none;transition:transform .04s}
+#rideui{position:absolute;inset:0;pointer-events:none}
+#rtop{position:absolute;top:56px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;max-width:94%}
+#rtop b#rname{background:#153b78;border:3px solid #0d2a57;padding:5px 12px;border-radius:6px;font-size:13px;text-align:center}
+#rinfo{background:#0f2a50dd;padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;text-align:center}
+#rcombo{color:#ffe08a;font-size:clamp(20px,5vw,34px);font-weight:900;letter-spacing:2px;text-shadow:0 3px 0 #0d2a57}
+#rbot{position:absolute;left:8px;right:8px;bottom:8px;display:flex;align-items:flex-end;justify-content:flex-end;gap:10px;pointer-events:none}
+#rbot .g{background:#153b78;border:3px solid #0d2a57;border-radius:6px;padding:8px 10px;width:min(240px,40%);margin-right:auto;margin-left:150px}
+#rbot button{pointer-events:auto;min-height:60px;min-width:96px;font-size:16px}
+#bBoost{--c:#e07b39;--d:#9a4d1c;--l:#f5b98a;min-width:130px;min-height:76px;font-size:22px}#bHome{--c:#2bb5c9;--d:#177686;--l:#8ae6f2;--t:#101a2b}
+.bar i.bad{background:#d1493f}
+@media (orientation:portrait){#rbot{flex-wrap:wrap;justify-content:flex-end}#rbot .g{width:100%;margin:0 0 4px;order:-1}#joy{bottom:150px}}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:6px 2px 10px;-webkit-overflow-scrolling:touch}.chips button{flex:none;font-size:11px;padding:9px 10px 7px}
+#aqlab{position:absolute;transform:translate(-50%,-100%);background:#153b78f2;border:3px solid #ffe08a;border-radius:8px;padding:6px 10px;font-size:12px;text-align:center;pointer-events:none;white-space:nowrap;z-index:2}
+#aqui{max-height:38%}
+.panel .row img{border-radius:6px;background:#0f2a50}
