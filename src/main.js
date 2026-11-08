@@ -184,7 +184,11 @@ function hud(){
 function pushInput(dt){let x=JOY.x,y=JOY.y;if(!JOY.on){x=(KEYS.ArrowRight||KEYS.KeyD?1:0)-(KEYS.ArrowLeft||KEYS.KeyA?1:0);y=(KEYS.ArrowDown||KEYS.KeyS?1:0)-(KEYS.ArrowUp||KEYS.KeyW?1:0)}
  world.inp.x=x;world.inp.y=y;world.inp.boost=!!(KEYS.ShiftLeft||KEYS.ShiftRight||(G.st==='ride'&&KEYS.Space)||G.boostBtn);world.inp.dive=G.st==='ride'?(G.dive||((KEYS.KeyQ?1:0)-(KEYS.KeyE?1:0))):0;
  if(G.st==='ride'){RS.ct-=dt;if(RS.ct<=0)RS.combo=0;if(world.rd)RS.dist=world.rd.dist}}
-let last=0;function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;pushInput(dt);if(G.slow>0)G.slow-=dt;const sd=G.slow>0?dt*.3:dt;if(!busy()||G.st==='result')update(sd);world.frame(sd,G,S,R(),tod);requestAnimationFrame(loop)}
+let last=0,errT=0;function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;
+ try{pushInput(dt);if(G.slow>0)G.slow-=dt;const sd=G.slow>0?dt*.3:dt;if(!busy()||G.st==='result')update(sd);world.frame(sd,G,S,R(),tod)}
+ catch(e){console.error(e);if(performance.now()-errT>4000){errT=performance.now();const ln=e&&e.stack?String(e.stack).split('\n')[1]||'':'';say('ERROR: '+(e&&e.message||e)+' '+ln.trim().slice(-60),6)}
+  if(world.rd){try{world.endRide()}catch(_){world.rd=null}G.st='idle';G.dive=0}}
+ requestAnimationFrame(loop)}
 const press=(e,fn)=>{e.addEventListener('pointerdown',ev=>{ev.preventDefault();fn(true)});['pointerup','pointerleave','pointercancel'].forEach(n=>e.addEventListener(n,()=>fn(false)))};
 press($('#bCast'),d=>d?startCharge():doCast());
 $('#bStrike').onclick=strike;$('#menuBtn').onclick=()=>{if(G.st==='idle')home()};
@@ -210,7 +214,7 @@ function aqua(){closeM();G.aq=true;const l=S.inv.slice();world.setMode('aqua');w
  l.forEach((x,i)=>{const f=FISH.find(y=>y.id===x.id),c=btn(`${f.name}${x.mut?' ['+x.mut+']':''} ${x.len}cm`,()=>pick(sel===i?-1:i));cb.push(c);chips.append(c)});
  const zr=h('div','btns');zr.append(btn('ZOOM +',()=>{world.azm=cl(world.azm*.8,.3,1.4)}),btn('ZOOM -',()=>{world.azm=cl(world.azm*1.25,.3,1.4)}),btn('TUTUP',closeAq));
  u.append(chips,act,h('p','','Tap ikan di dalam akuarium atau di daftar untuk melihat nama dan ukurannya. Geser layar untuk memutar kamera.'),zr)}
-function beginRide(co){closeM();const f=fishOf(co);if(world.startRide(f)){G.st='ride';G.f=null;RS.coins=RS.pearls=RS.gems=RS.combo=0;RS.dist=0;RS.ct=0;say(`Naik ${f.name}! Joystick/WASD untuk bergerak, SHIFT/BOOST untuk ngebut. Tahan SELAM / NAIK (Q / E) untuk menyelam.`,3.2);sfx('splash')}}
+function beginRide(co){closeM();try{const f=fishOf(co);if(!world.startRide(f)){say('Tidak bisa naik ikan sekarang, coba lagi.',2.5);return}{G.st='ride';G.f=null;RS.coins=RS.pearls=RS.gems=RS.combo=0;RS.dist=0;RS.ct=0;say(`Naik ${f.name}! Joystick/WASD untuk bergerak, SHIFT/BOOST untuk ngebut. Tahan SELAM / NAIK (Q / E) untuk menyelam.`,3.2);sfx('splash')}}catch(e){console.error(e);say('ERROR NAIK IKAN: '+(e&&e.message||e),8);if(world.rd){try{world.endRide()}catch(_){world.rd=null}}G.st='idle'}}
 function rideMenu(){if(G.st!=='idle')return;const b=h('div'),mk=co=>{const f=fishOf(co),m=h('img');m.src=thumb(f,false,f.mut);m.style.cssText='width:84px;flex:none';const r=h('div','row');const inf=h('span','',`<b>${f.name}</b><small>${co.mut?'MUTASI '+co.mut+' | ':''}${f.rarity} | ${f.len} cm | ${f.weight} kg | kecepatan ${rideSpeed(f).toFixed(1)}</small>`);r.append(m,inf,btn('NAIKI',()=>beginRide(co)));return r};
  b.append(h('p','','Pilih ikan dari Tas untuk ditunggangi menjelajah sungai. Ikan besar lebih gagah, ikan langka/mutasi lebih cepat. Kumpulkan mutiara dan kristal untuk koin dan XP!'));
  S.inv.slice(0,40).forEach(co=>b.append(mk(co)));
