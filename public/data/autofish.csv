@@ -1,0 +1,7 @@
+id,name,hours,coin_price,gem_price,desc
+a5,Trial 5 Jam,5,2000,0,Mancing otomatis 5 jam
+a8,Trial 8 Jam,8,3200,0,Mancing otomatis 8 jam
+a10,Trial 10 Jam,10,4000,0,Mancing otomatis 10 jam
+a24,Paket 24 Jam,24,9000,0,Mancing otomatis 24 jam
+a48,Paket 48 Jam,48,16000,0,Mancing otomatis 48 jam
+perm,Auto PERMANEN,0,0,1200,Aktif selamanya. Wajib top up Kristal dulu

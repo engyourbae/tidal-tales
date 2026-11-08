@@ -1,0 +1,5 @@
+id,label,gems,price_label
+t1,Paket Kecil,100,Rp 10.000
+t2,Paket Sedang,350,Rp 30.000
+t3,Paket Besar,800,Rp 65.000
+t4,Paket Sultan,1500,Rp 119.000

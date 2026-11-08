@@ -1,14 +1,17 @@
-id,parent,order,label,action,param,dock,desc
-m_play,home,1,MAIN,play,,0,Kembali memancing
-m_shop,home,2,TOKO,shop,rods,1,Beli joran reel senar kail dan umpan
-m_bag,home,3,TAS IKAN,shop,sell,1,Jual atau pamerkan ikan simpananmu
-m_aqua,home,4,AKUARIUM,aqua,,1,Lihat ikan simpananmu berenang
-m_dex,home,5,INDEKS,dex,,1,Koleksi spesies dan mutasi
-m_loc,home,6,LOKASI,locs,,1,Pilih tempat memancing
-m_set,home,7,PENGATURAN,opts,,1,Suara musik cuaca dan kode redeem
-t_rods,shop,1,Joran,,rods,0,
-t_reels,shop,2,Reel,,reels,0,
-t_lines,shop,3,Senar,,lines,0,
-t_hooks,shop,4,Kail,,hooks,0,
-t_baits,shop,5,Umpan,,baits,0,
-t_sell,shop,6,Tas Ikan,,sell,0,
+id,parent,order,label,action,param,dock,color,desc
+m_play,home,1,MAIN,play,,0,#d1493f,Kembali memancing
+m_shop,home,2,TOKO,shop,rods,1,#e9b52f,Beli joran reel senar kail dan umpan
+m_auto,home,3,AUTO MANCING,shop,auto,1,#2bb5c9,Paket mancing otomatis
+m_bag,home,4,TAS IKAN,shop,sell,1,#e07b39,Jual atau pamerkan ikan
+m_aqua,home,5,AKUARIUM,aqua,,1,#2f9ac4,Ikan simpananmu berenang
+m_dex,home,6,INDEKS,dex,,1,#7b4fb8,Koleksi spesies dan mutasi
+m_loc,home,7,LOKASI,locs,,1,#3f9e6e,Pilih tempat memancing
+m_set,home,8,PENGATURAN,opts,,1,#7d8996,Suara musik cuaca dan kode
+t_rods,shop,1,Joran,,rods,0,,
+t_reels,shop,2,Reel,,reels,0,,
+t_lines,shop,3,Senar,,lines,0,,
+t_hooks,shop,4,Kail,,hooks,0,,
+t_baits,shop,5,Umpan,,baits,0,,
+t_auto,shop,6,Auto,,auto,0,,
+t_topup,shop,7,Top Up,,topup,0,,
+t_sell,shop,8,Tas,,sell,0,,
