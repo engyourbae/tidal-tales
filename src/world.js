@@ -72,7 +72,7 @@ export class World{
   this.stars=new THREE.Points(new THREE.BufferGeometry().setAttribute('position',new THREE.Float32BufferAttribute(sp,3)),new THREE.PointsMaterial({color:'#ffffff',size:2.2,sizeAttenuation:false,fog:false}));this.stars.visible=false;s.add(this.stars);
   const fp=[];for(let i=0;i<45;i++)fp.push((Math.random()<.5?-1:1)*(5+Math.random()*10),.4+Math.random()*2,1-Math.random()*14);this.ffb=Float32Array.from(fp);
   this.ff=new THREE.Points(new THREE.BufferGeometry().setAttribute('position',new THREE.Float32BufferAttribute(fp.slice(),3)),new THREE.PointsMaterial({color:'#e9e27a',size:.12}));this.ff.visible=false;this.ff.frustumCulled=false;s.add(this.ff);
-  this.rd=Array.from({length:520},()=>({x:(Math.random()-.5)*26,y:Math.random()*14,z:3-Math.random()*36,s:12+Math.random()*8}));
+  this.rdp=Array.from({length:520},()=>({x:(Math.random()-.5)*26,y:Math.random()*14,z:3-Math.random()*36,s:12+Math.random()*8}));
   this.rain=new THREE.LineSegments(new THREE.BufferGeometry().setAttribute('position',new THREE.BufferAttribute(new Float32Array(520*6),3)),new THREE.LineBasicMaterial({color:'#bcd2e8',transparent:true,opacity:.5}));this.rain.frustumCulled=false;this.rain.visible=false;s.add(this.rain);
   this.bolts=[0,1,2].map(()=>{const g=new THREE.Group(),bg=new THREE.BufferGeometry().setAttribute('position',new THREE.BufferAttribute(new Float32Array(36),3));for(const dx of[-.06,0,.06]){const l=new THREE.Line(bg,new THREE.LineBasicMaterial({color:'#eef4ff'}));l.position.x=dx;l.frustumCulled=false;g.add(l)}g.visible=false;g.userData={l:0};s.add(g);return g});this.bi=0;
   this.mt=[];for(let i=0;i<4;i++){const g=new THREE.Group(),core=new THREE.Mesh(new THREE.IcosahedronGeometry(.55,0),new THREE.MeshStandardMaterial({color:'#5b4032',emissive:'#ff7a2a',emissiveIntensity:1,flatShading:true})),
@@ -342,7 +342,7 @@ export class World{
   this.heat=Math.max(0,(this.heat||0)-dt*.2);this.water.material.emissive.set(this.heatCol||'#ff7a2a');this.water.material.emissiveIntensity=this.heat*.4;
   const wx=this.wx||'clear';
   if(this.rain.visible){const p=this.rain.geometry.attributes.position.array,sm=wx==='storm',wd=sm?.35:.12;this.rrT-=dt;if(this.rrT<=0){this.rrT=.07;this.ringAt(V((Math.random()-.5)*18,.03,3-Math.random()*22),'#dfeaf2',.5,3)}
-   this.rd.forEach((d,i)=>{d.y-=d.s*dt*(sm?1.4:1);d.x+=wd*d.s*dt;if(d.y<0){d.y=14;d.x=(Math.random()-.5)*26-3;d.z=3-Math.random()*36}const o=i*6;p[o]=d.x;p[o+1]=d.y;p[o+2]=d.z;p[o+3]=d.x-wd*.6;p[o+4]=d.y+.8;p[o+5]=d.z});this.rain.geometry.attributes.position.needsUpdate=true}
+   this.rdp.forEach((d,i)=>{d.y-=d.s*dt*(sm?1.4:1);d.x+=wd*d.s*dt;if(d.y<0){d.y=14;d.x=(Math.random()-.5)*26-3;d.z=3-Math.random()*36}const o=i*6;p[o]=d.x;p[o+1]=d.y;p[o+2]=d.z;p[o+3]=d.x-wd*.6;p[o+4]=d.y+.8;p[o+5]=d.z});this.rain.geometry.attributes.position.needsUpdate=true}
   if(wx==='storm'||wx==='omen'){this.lt-=dt;if(this.lt<=0){const om=wx==='omen';this.lt=om?.6+Math.random()*1.4:3+Math.random()*6;this.zap(om?(this.omenCol||'#ff5a7a'):'#eef4ff');if(om&&Math.random()<.5)setTimeout(()=>this.zap(this.omenCol||'#ff5a7a'),150)}}
   for(const b of this.bolts)if(b.visible){b.userData.l-=dt;if(b.userData.l<=0)b.visible=false}
   if(wx!=='storm'&&wx!=='omen')this.bolts.forEach(b=>b.visible=false);
