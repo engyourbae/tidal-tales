@@ -224,13 +224,13 @@ export class World{
   const ix=RN.indexOf(f.rarity),P=this.pl,x0=cl(P.position.x,-2.4,2.4),z0=-1.7-L*.35,D1=m.children[0]?m.children[0].scale.y:.2;
   this.rd={m,L,f,x:x0,z:z0,vx:0,vz:0,yaw:Math.PI/2,roll:0,ph:'mount',t:0,from:P.position.clone(),to:null,stam:100,exh:false,boost:false,top:Math.max(.12,D1)*L,ps:.5,fx:0,fz:-1,
    spd:rideSpeed(f),dist:0,rt:0,sink:0,auto:null,spray:0,dep:0,dv:0,o2:100,pit:0,low:false,bt:0};
-  this.dur=.7+Math.hypot(x0-P.position.x,z0-P.position.z)*.08;this.ensureItems();this.ensureDive();this.tank.visible=this.mask.visible=true;this.itm.visible=true;this.rideH=[V(0,0,0),V(0,0,0)];this.fk=0;return this.rd}
- ensureDive(){if(this.tank)return;const mm=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.5,metalness:.35,...o}),T=this.tank=new THREE.Group(),yl=mm('#e9c24b'),dk=mm('#2a3340');T.visible=false;
+  this.dur=.7+Math.hypot(x0-P.position.x,z0-P.position.z)*.08;this.ensureItems();this.ensureDive();this.o2t.visible=this.o2m.visible=true;this.itm.visible=true;this.rideH=[V(0,0,0),V(0,0,0)];this.fk=0;return this.rd}
+ ensureDive(){if(this.o2t)return;const mm=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.5,metalness:.35,...o}),T=this.o2t=new THREE.Group(),yl=mm('#e9c24b'),dk=mm('#2a3340');T.visible=false;
   const add=(g,m,x,y,z,p=T)=>{const o=new THREE.Mesh(g,m);o.position.set(x,y,z);p.add(o);return o};
   for(const x of[-.1,.1]){add(new THREE.CylinderGeometry(.085,.085,.6,10),yl,x,0,0);add(new THREE.SphereGeometry(.085,10,6,0,6.283,0,1.5708),yl,x,.3,0);add(new THREE.CylinderGeometry(.03,.03,.1,6),dk,x,.39,0)}
   add(new THREE.BoxGeometry(.34,.06,.2),dk,0,.12,0);add(new THREE.BoxGeometry(.34,.06,.2),dk,0,-.14,0);add(new THREE.CylinderGeometry(.014,.014,.3,5).rotateZ(Math.PI/2),dk,0,.43,0);
   T.position.set(0,.42,.52);this.tb.add(T);
-  const M=this.mask=new THREE.Group();M.visible=false;add(new THREE.BoxGeometry(.36,.13,.08),dk,0,.03,-.2,M);add(new THREE.BoxGeometry(.28,.09,.02),mm('#7ff3ff',{emissive:'#2bb5c9',emissiveIntensity:.6,transparent:true,opacity:.85}),0,.03,-.245,M);add(new THREE.CylinderGeometry(.022,.022,.08,6).rotateX(Math.PI/2),dk,0,-.07,-.22,M);this.head.add(M)}
+  const M=this.o2m=new THREE.Group();M.visible=false;add(new THREE.BoxGeometry(.36,.13,.08),dk,0,.03,-.2,M);add(new THREE.BoxGeometry(.28,.09,.02),mm('#7ff3ff',{emissive:'#2bb5c9',emissiveIntensity:.6,transparent:true,opacity:.85}),0,.03,-.245,M);add(new THREE.CylinderGeometry(.022,.022,.08,6).rotateX(Math.PI/2),dk,0,-.07,-.22,M);this.head.add(M)}
  bubbleAt(v,n=1){if(!this.bub){const g=new THREE.SphereGeometry(1,6,5),mt=new THREE.MeshBasicMaterial({color:'#cfefff',transparent:true,opacity:.7,depthWrite:false});this.bub=Array.from({length:40},()=>{const m=new THREE.Mesh(g,mt);m.visible=false;m.userData={s:.1,v:1};this.s.add(m);return m})}
   for(let i=0;i<n;i++){const m=this.bub.find(x=>!x.visible);if(!m)return;m.visible=true;m.position.set(v.x+(Math.random()-.5)*.2,v.y,v.z+(Math.random()-.5)*.2);m.userData.s=.05+Math.random()*.08;m.userData.v=.8+Math.random()*.7;m.scale.setScalar(m.userData.s)}}
  updBub(dt){if(!this.bub)return;for(const m of this.bub)if(m.visible){m.position.y+=m.userData.v*dt;m.position.x+=Math.sin(this.t*5+m.userData.v*9)*dt*.12;if(m.position.y>.02)m.visible=false}}
@@ -281,7 +281,7 @@ export class World{
   // items anim
   if(this.itm){for(const o of this.items){const d=o.userData;o.position.set(d.x,d.dy>.2?-d.dy+Math.sin(t*2+d.ph)*.15:.45+Math.sin(t*2+d.ph)*.15+this.wave(d.x,d.z,t),d.z);d.oc.rotation.y=t*2;d.halo.material.opacity=.18+.1*Math.sin(t*4+d.ph)}}
   }
- endRide(){const R=this.rd;if(!R)return;this.s.remove(R.m);if(this.tank)this.tank.visible=this.mask.visible=false;if(this.bub)this.bub.forEach(b=>b.visible=false);this.rd=null;this.uwEnv();this.rideH=null;this.itm.visible=false;this.pl.scale.setScalar(1);this.cam.fov=this.cam.aspect<1?74:52;this.cam.updateProjectionMatrix();this.onRide&&this.onRide('end')}
+ endRide(){const R=this.rd;if(!R)return;this.s.remove(R.m);if(this.o2t)this.o2t.visible=this.o2m.visible=false;if(this.bub)this.bub.forEach(b=>b.visible=false);this.rd=null;this.uwEnv();this.rideH=null;this.itm.visible=false;this.pl.scale.setScalar(1);this.cam.fov=this.cam.aspect<1?74:52;this.cam.updateProjectionMatrix();this.onRide&&this.onRide('end')}
  rideCam(base,look,dt){const R=this.rd;if(!R)return;const L=R.L,por=this.cam.aspect<1;
   base.set(R.x*.85,3.4+L*.55+(por?1.6:0)-R.dep*1.7,R.z+6.2+L*.9+(por?2.5:0));look.set(R.x,.3+L*.15-R.dep,R.z-3.2);
   const kk=((R.boost?9:0)-(this.fk||0))*Math.min(1,dt*4);this.fk=(this.fk||0)+kk;const fv=(por?74:52)+this.fk;if(Math.abs(this.cam.fov-fv)>.05){this.cam.fov=fv;this.cam.updateProjectionMatrix()}}
