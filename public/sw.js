@@ -1,4 +1,4 @@
-const CACHE='tidal-tales-v8';
+const CACHE='tidal-tales-v9';
 const PRE=['./','index.html','manifest.webmanifest','data/fish_catalog.csv','data/gear.csv','data/menus.csv','data/locations.csv','data/autofish.csv','data/topup.csv','icon-192.png','icon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(PRE)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
