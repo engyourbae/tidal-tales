@@ -50,10 +50,10 @@ export function makeFish(f,dark=false,mut=null){
 export function animateFish(g,t,sp=.5){const u=g.userData;u.tails.forEach(o=>o.p.rotation[o.ax||'y']=Math.sin(t*(4+sp*9)+o.ph)*(.22+sp*.3));u.fins.forEach((p,i)=>p.rotation.x=(i?-1:1)*(u.fr+Math.sin(t*3+i)*u.fa))}
 
 let tr_,ts,tc;const cache={};
-export function thumb(f,dark=false){
- const k=f.id+dark;if(cache[k])return cache[k];
+export function thumb(f,dark=false,mut=null){
+ const k=f.id+dark+(mut?mut.k:'');if(cache[k])return cache[k];
  if(!tr_){tr_=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});tr_.setSize(240,120);ts=new THREE.Scene();ts.add(new THREE.HemisphereLight('#ffffff','#667788',1.6));const d=new THREE.DirectionalLight('#ffffff',2);d.position.set(1,2,3);ts.add(d);tc=new THREE.PerspectiveCamera(30,2,.1,20);tc.position.set(.1,.25,2.5);tc.lookAt(0,0,0)}
- const m=makeFish(f,dark);m.rotation.y=-.45;ts.add(m);tr_.render(ts,tc);const url=tr_.domElement.toDataURL();ts.remove(m);return cache[k]=url}
+ const m=makeFish(f,dark,mut);m.rotation.y=-.45;ts.add(m);tr_.render(ts,tc);const url=tr_.domElement.toDataURL();ts.remove(m);return cache[k]=url}
 
 let vr,vs,vc,vm,vraf=0;
 export function startViewer(f){stopViewer();
