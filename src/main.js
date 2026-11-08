@@ -8,7 +8,7 @@ const RW={Common:55,Uncommon:25,Rare:13,Epic:5,Legendary:1.7,Mythic:.3};
 const LOCS=[{n:'Willow Lake',lv:1,sky:'#a9d6e5',wat:'#2f7f9e',bank:'#5b7f4a'},{n:'Misty River',lv:3,sky:'#c3cfd4',wat:'#4a7a86',bank:'#6f7d52'},{n:'Mangrove Marsh',lv:6,sky:'#b9c79a',wat:'#5a6b3c',bank:'#3e4f2c'},{n:'Coral Bay',lv:10,sky:'#8fd3dc',wat:'#1f93a8',bank:'#d8c48a'},{n:'Abyssal Trench',lv:15,sky:'#2b3a5c',wat:'#101c3a',bank:'#262e44'}];
 const TODS=['siang','senja','malam'];
 let FISH=[],GEAR={},S,tod='siang';
-const fresh=()=>({coins:50,gem:0,auto:{until:0,perm:false,on:false,act:'jual'},unl:false,xp:0,lv:1,rod:'rod_wood',reel:'reel_basic',line:'line_2kg',hook:'hook_small',own:['rod_wood','reel_basic','line_2kg','hook_small'],baits:{bait_worm:20},bait:'bait_worm',loc:0,inv:[],dex:{},stats:{caught:0,broke:0},opt:{shake:true,sound:true,fx:true,music:true,wx:'acak'}});
+const fresh=()=>({coins:50,gem:0,auto:{until:0,perm:false,on:false,act:'jual'},luck:{until:0},unl:false,xp:0,lv:1,rod:'rod_wood',reel:'reel_basic',line:'line_2kg',hook:'hook_small',own:['rod_wood','reel_basic','line_2kg','hook_small'],baits:{bait_worm:20},bait:'bait_worm',loc:0,inv:[],dex:{},stats:{caught:0,broke:0},opt:{shake:true,sound:true,fx:true,music:true,wx:'acak'}});
 const load=()=>{try{const d=JSON.parse(localStorage.getItem(KEY));return d?{...fresh(),...d}:fresh()}catch{return fresh()}};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}};
 const spend=c=>S.unl||(S.coins>=c&&(S.coins-=c,true));
@@ -27,10 +27,10 @@ const say=(t,s=2)=>{const m=$('#msg');m.textContent=t;m.hidden=!t;G.msgT=s};
 const reset=()=>{G.st='idle';G.f=null;G.reel=false;G.ten=0;G.sta=100;G.dist=100;G.surge=0;G.ct=0;G.swT=0;G.swDir=null;G.prog=0;G.en=0;if(G.omenT>60)G.omenT=6};
 
 const MW={albino:40,emas:30,neon:20,bayangan:8,kosmik:2};
-function rollMut(){const p=Math.min(.6,.05*({rain:1.3,storm:2,meteor:6}[G.wx]||1)*(G.bait==='bait_moon'?1.5:1));if(Math.random()>p)return null;const w={...MW};if(G.wx==='meteor')w.kosmik*=15;let r=Math.random()*Object.values(w).reduce((a,b)=>a+b,0);for(const k in w){r-=w[k];if(r<=0)return{k,...MUT[k]}}return{k:'albino',...MUT.albino}}
+function rollMut(){const p=Math.min(.6,.05*({rain:1.3,storm:2,meteor:6}[G.wx]||1)*(G.bait==='bait_moon'?1.5:1)*(luckOn()?1.5:1));if(Math.random()>p)return null;const w={...MW};if(G.wx==='meteor')w.kosmik*=15;let r=Math.random()*Object.values(w).reduce((a,b)=>a+b,0);for(const k in w){r-=w[k];if(r<=0)return{k,...MUT[k]}}return{k:'albino',...MUT.albino}}
 function pick(){
  const L=LOCS[S.loc].n,pool=FISH.filter(f=>f.hab.some(x=>x.n===L&&(!x.c||(x.c==='event'?S.bait==='bait_moon'&&Math.random()<.25:x.c===tod))));
- const list=pool.length?pool:FISH.filter(f=>f.hab.some(x=>x.n===L)),b=G.bait?it('baits',G.bait):null,far=(1+G.pw/200)*({rain:1.1,storm:1.3,meteor:1.5}[G.wx]||1),ws={};
+ const list=pool.length?pool:FISH.filter(f=>f.hab.some(x=>x.n===L)),b=G.bait?it('baits',G.bait):null,far=(1+G.pw/200)*({rain:1.1,storm:1.3,meteor:1.5}[G.wx]||1)*(luckOn()?2.5:1),ws={};
  list.forEach(f=>{if(ws[f.rarity]===undefined){let w=RW[f.rarity];if(b&&b.attracts.includes(f.rarity)&&b.habitat.includes(L))w*=2.5;if(RN.indexOf(f.rarity)>=2)w*=far;if(f.rarity==='Legendary'&&S.lv<5&&!S.unl)w=0;if(f.rarity==='Mythic'&&S.lv<8&&!S.unl)w=0;ws[f.rarity]=w}});
  let tot=Object.values(ws).reduce((a,b)=>a+b,0),r=Math.random()*tot,rar=Object.keys(ws)[0];
  for(const k in ws){r-=ws[k];if(r<=0){rar=k;break}}
@@ -56,13 +56,14 @@ function tap(auto){
  if(!auto){G.en=Math.min(100,G.en+(dtp<.22?9:dtp<.35?5:2.5));G.eMax=Math.max(G.eMax,G.en);G.eSum+=G.en;G.eN++}
  const mult=auto?1:(G.en>=66?2.2:G.en>=33?1.5:1),ratio=G.f.weight/(LN().strength_kg*1.2),sp=R().reel_speed+RL().reel_speed_bonus;
  G.prog=Math.min(100,G.prog+Math.max(1.4,(3.6+R().control*.03+sp*.04)*mult/(1+Math.min(ratio,2)*.35)));
- G.tapP=1;G.spinV=24+G.en*.3;
+ G.tapP=1;G.spinV=24+G.en*.3;if(G.prog>=100){finish();return}
  if(!auto){if(G.en>=66&&!G.fr){G.fr=true;say('ENERGI PENUH! FRENZY',.9);world.ring(G.cd,'#e9a23b',3)}if(G.en<50)G.fr=false}}
 function swipe(dir){
  if(G.st!=='fight'||G.swT<=0)return;
- if(dir===G.swDir){G.prog=Math.min(100,G.prog+10);G.en=Math.min(100,G.en+25);G.eMax=Math.max(G.eMax,G.en);G.swT=0;G.swDir=null;G.tapP=1;sfx('ok');say('MANTAP!',.6);world.burstAt(world.bp,'#e9a23b',16,4,1)}
+ if(dir===G.swDir){G.prog=Math.min(100,G.prog+10);G.en=Math.min(100,G.en+25);G.eMax=Math.max(G.eMax,G.en);G.swT=0;G.swDir=null;G.tapP=1;sfx('ok');say('MANTAP!',.6);world.burstAt(world.bp,'#e9a23b',16,4,1);if(G.prog>=100)finish()}
  else{G.swT=Math.max(.01,G.swT-.4);sfx('fail')}}
 function fight(dt){
+ if(G.prog>=100){finish();return}
  const sur=G.surge>0;G.ft+=dt;
  G.en=Math.max(0,G.en-(G.swT>0?0:(8+G.en*.12))*dt);
  G.sn-=dt;if(sur)G.surge-=dt;else if(G.sn<=0&&G.swT<=0){G.surge=.7;G.sn=rnd(2.5,4.5)}
@@ -81,6 +82,7 @@ function weather(dt){if(G.omenT>0){G.omenT-=dt;if(G.omenT<=0){const m=S.opt.wx||
 const shade=(hex,k)=>{const n=parseInt(hex.slice(1),16),f=c=>Math.max(0,Math.min(255,Math.round(k>0?c+(255-c)*k:c*(1+k))));return'#'+[16,8,0].map(x=>f((n>>x)&255).toString(16).padStart(2,'0')).join('')};
 const lego=(b,c)=>{if(c){const n=parseInt(c.slice(1),16),lum=(.3*(n>>16&255)+.59*(n>>8&255)+.11*(n&255));b.style.setProperty('--c',c);b.style.setProperty('--d',shade(c,-.38));b.style.setProperty('--l',shade(c,.45));b.style.setProperty('--t',lum>150?'#101a2b':'#ffffff')}return b};
 const fmtT=ms=>{const t=Math.floor(Math.max(0,ms)/1000);return[Math.floor(t/3600),Math.floor(t%3600/60),t%60].map(x=>String(x).padStart(2,'0')).join(':')};
+const luckOn=()=>!!(S.unl?S.luck&&S.luck.until>Date.now():S.luck&&S.luck.until>Date.now()),LUCKS=[{n:'Ramuan Hoki',m:10,c:400},{n:'Jimat Keberuntungan',m:30,c:1000},{n:'Semanggi Emas',m:60,c:1800}];
 const autoActive=()=>!!(S.auto&&(S.auto.perm||Date.now()<S.auto.until));
 const autoTxt=()=>S.auto&&S.auto.on?(S.auto.perm?' | AUTO PERMANEN':' | AUTO '+fmtT(S.auto.until-Date.now())):'';
 let autoT=1,autoTapT=0,autoBite=0,autoSw=0;
@@ -148,6 +150,8 @@ function shop(tab){if(tab==='sell')world.setRoom('bag',{list:S.inv.slice(0,8).ma
   GEAR.baits.forEach(g=>{const st=S.baits[g.id]||0;row(g.name,`Menarik ${g.attracts.join('/')} di ${g.habitat.join(', ')} | Stok ${S.unl?'UNLIMITED':st}`,[btn(`BELI x10 ${g.price*10}`,()=>{if(!spend(g.price*10))return alert('Koin kurang.');S.baits[g.id]=st+10;save();shop(tab)}),btn(S.bait===g.id?'DIPAKAI':'PAKAI',()=>{S.bait=g.id;save();shop(tab)},S.bait===g.id?'on':'')])})}
  if(tab==='sell'){const tot=S.inv.reduce((a,x)=>a+x.val,0);S.inv.forEach((x,i)=>{const f=FISH.find(y=>y.id===x.id);row(f.name,`${x.mut?'MUTASI '+x.mut+' | ':''}${x.r} | ${x.len} cm | ${x.w} kg`,[btn('PEGANG',()=>startFlex(x,()=>{reset();shop('sell')})),btn(`JUAL ${x.val}`,()=>{S.coins+=x.val;S.inv.splice(i,1);save();shop(tab)})])});
   b.append(S.inv.length?btn(`JUAL SEMUA ${tot}`,()=>{S.coins+=tot;S.inv=[];save();shop(tab)}):h('p','','Tas ikan kosong.'))}
+ if(tab==='luck'){const L=S.luck,left=Math.max(0,L.until-Date.now()),full=left>=3600e3-1000;b.append(h('p','',luckOn()?`Luck aktif, sisa ${fmtT(left)} (maks 1 jam). Ikan langka x2.5, mutasi x1.5.`:'Luck belum aktif. Beli item untuk menambah peluang ikan langka dan mutasi. Waktu menumpuk, maksimal 1 jam.'));
+  LUCKS.forEach(p=>{const ok=S.unl||S.coins>=p.c,bt=btn(full?'PENUH 1 JAM':ok?`BELI ${p.c}`:'KOIN KURANG',()=>{if(!spend(p.c))return alert('Koin kurang.');L.until=Math.min(Date.now()+3600e3,Math.max(Date.now(),L.until)+p.m*60e3);save();shop('luck')});bt.disabled=full||!ok;row(p.n,`+${p.m} menit | ${p.c} koin`,[bt])})}
  if(tab==='auto'){const A=S.auto;b.append(h('p','',autoActive()?(A.perm?'Auto Mancing: PERMANEN aktif.':`Auto Mancing aktif, sisa ${fmtT(A.until-Date.now())}`):'Auto belum aktif. Beli paket lalu nyalakan tombol AUTO saat memancing. Auto berjalan selama game terbuka.'));
   AUTOS.forEach(p=>{const perm=Number(p.hours)===0,cost=perm?p.gem_price:p.coin_price,have=perm?S.gem:S.coins,ok=S.unl||have>=cost;
    row(p.name,`${p.desc} | ${cost} ${perm?'Kristal':'koin'}`,[btn(ok?`BELI ${cost}`:(perm?'TOP UP DULU':'KOIN KURANG'),()=>{if(!ok){if(perm)return shop('topup');return alert('Koin kurang.')}
@@ -158,7 +162,7 @@ function shop(tab){if(tab==='sell')world.setRoom('bag',{list:S.inv.slice(0,8).ma
 
 /* ===== render ===== */
 function hud(){
- $('#coins').textContent=`KOIN ${S.unl?'UNL':S.coins}  KRISTAL ${S.unl?'UNL':S.gem}`;$('#lvl').textContent=`LV ${S.lv}  XP ${S.xp}/${S.lv*120}`;$('#loc').textContent=`${LOCS[S.loc].n} | ${tod} | ${WXN[G.wx]}${autoTxt()}`;
+ $('#coins').textContent=`KOIN ${S.unl?'UNL':S.coins}  KRISTAL ${S.unl?'UNL':S.gem}`;$('#lvl').textContent=`LV ${S.lv}  XP ${S.xp}/${S.lv*120}`;$('#loc').textContent=`${LOCS[S.loc].n} | ${tod} | ${WXN[G.wx]}${autoTxt()}${luckOn()?' | LUCK '+fmtT(S.luck.until-Date.now()):''}`;
  const s=G.st,pw=s==='charge',bt=s==='bite',ft=s==='fight';
  $('#gauges').hidden=!(pw||bt||ft);$('#g1').hidden=!(pw||bt);$('#g2').hidden=$('#g3').hidden=!ft;
  const f1=$('#f1'),f2=$('#f2'),f3=$('#f3');
@@ -179,7 +183,7 @@ addEventListener('keyup',e=>{if(e.code==='Space'){G.st==='charge'?doCast():G.ree
 const csvp=t=>Papa.parse(t.replace(/^\uFEFF/,''),{header:true,dynamicTyping:true,skipEmptyLines:true}).data;
 let MENUS=[],AUTOS=[],TOPUPS=[];const ACT={play:()=>closeM(),shop:p=>shop(p||'rods'),dex:()=>dex(),aqua:()=>aqua(),locs:()=>locs(),opts:()=>opts(),home:()=>home()};
 const runMenu=m=>{const f=ACT[m.action];if(f)f(m.param)};
-const shopTabs=()=>MENUS.filter(m=>m.parent==='shop').sort((a,b)=>a.order-b.order).map(m=>[m.param,m.label]);
+const shopTabs=()=>MENUS.filter(m=>m.parent==='shop').sort((a,b)=>a.order-b.order).map(m=>[m.param,m.label]).reduce((a,x,i)=>{a.push(x);if(x[0]==='baits')a.push(['luck','Luck']);return a},[]);
 const fishOf=co=>{const b=FISH.find(x=>x.id===co.id),k=co.mk||Object.keys(MUT).find(z=>MUT[z].n===co.mut);return{...b,sc:Math.random(),mut:k?{k,...MUT[k]}:null,weight:co.w,len:co.len}};
 function closeAq(){G.aq=false;world.setMode('game');$('#aqui').hidden=true}
 function aqua(){closeM();G.aq=true;const l=S.inv.slice(0,18);world.setMode('aqua');world.aqFish(l.map(fishOf));world.azd=0;
