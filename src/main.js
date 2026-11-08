@@ -179,10 +179,10 @@ function hud(){
  const sw=$('#swipe');sw.hidden=!(ft&&G.swT>0);if(!sw.hidden){sw.dataset.d=G.swDir;$('#swt').textContent={L:'GESER KIRI',R:'GESER KANAN',U:'GESER ATAS',D:'GESER BAWAH'}[G.swDir];$('#swb').style.width=(G.swT/G.swMax*100)+'%'}
  $('#hud').hidden=!!G.aq||s==='flex'||s==='ride'||busy();
  {const rd=world.rd,ride=s==='ride'&&!busy();$('#joy').hidden=!((s==='idle'||ride)&&!busy()&&!G.aq);$('#rideui').hidden=!ride;
-  if(ride&&rd){$('#rst').style.width=rd.stam+'%';$('#rst').className=rd.exh?'bad':rd.stam<30?'warn':'sta';$('#rinfo').textContent=`KOIN +${RS.coins} | MUTIARA ${RS.pearls} | KRISTAL +${RS.gems} | JARAK ${Math.round(RS.dist*.6)} m`;$('#rcombo').textContent=RS.combo>=3?`COMBO x${Math.min(5,1+Math.floor(RS.combo/3))}  (${RS.combo})`:'';$('#bBoost').classList.toggle('on',!!rd.boost);$('#rname').textContent=`${rd.f.name} | ${Math.round(rd.sp||0)} / ${rd.spd.toFixed(1)} kec`}}$('#dock').hidden=!(s==='idle'&&!busy()&&!G.aq);$('#flexui').hidden=s!=='flex'}
+  if(ride&&rd){$('#rst').style.width=rd.stam+'%';$('#rst').className=rd.exh?'bad':rd.stam<30?'warn':'sta';{const o=$('#ro2');if(o){o.style.width=rd.o2+'%';o.className=rd.o2<25?'bad':rd.o2<50?'warn':'sta';$('#rolab').textContent=`OKSIGEN | KEDALAMAN ${rd.dep.toFixed(1)} m`}}$('#rinfo').textContent=`KOIN +${RS.coins} | MUTIARA ${RS.pearls} | KRISTAL +${RS.gems} | JARAK ${Math.round(RS.dist*.6)} m`;$('#rcombo').textContent=RS.combo>=3?`COMBO x${Math.min(5,1+Math.floor(RS.combo/3))}  (${RS.combo})`:'';$('#bBoost').classList.toggle('on',!!rd.boost);$('#rname').textContent=`${rd.f.name} | ${Math.round(rd.sp||0)} / ${rd.spd.toFixed(1)} kec`}}$('#dock').hidden=!(s==='idle'&&!busy()&&!G.aq);$('#flexui').hidden=s!=='flex'}
 
 function pushInput(dt){let x=JOY.x,y=JOY.y;if(!JOY.on){x=(KEYS.ArrowRight||KEYS.KeyD?1:0)-(KEYS.ArrowLeft||KEYS.KeyA?1:0);y=(KEYS.ArrowDown||KEYS.KeyS?1:0)-(KEYS.ArrowUp||KEYS.KeyW?1:0)}
- world.inp.x=x;world.inp.y=y;world.inp.boost=!!(KEYS.ShiftLeft||KEYS.ShiftRight||(G.st==='ride'&&KEYS.Space)||G.boostBtn);
+ world.inp.x=x;world.inp.y=y;world.inp.boost=!!(KEYS.ShiftLeft||KEYS.ShiftRight||(G.st==='ride'&&KEYS.Space)||G.boostBtn);world.inp.dive=G.st==='ride'?(G.dive||((KEYS.KeyQ?1:0)-(KEYS.KeyE?1:0))):0;
  if(G.st==='ride'){RS.ct-=dt;if(RS.ct<=0)RS.combo=0;if(world.rd)RS.dist=world.rd.dist}}
 let last=0;function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;pushInput(dt);if(G.slow>0)G.slow-=dt;const sd=G.slow>0?dt*.3:dt;if(!busy()||G.st==='result')update(sd);world.frame(sd,G,S,R(),tod);requestAnimationFrame(loop)}
 const press=(e,fn)=>{e.addEventListener('pointerdown',ev=>{ev.preventDefault();fn(true)});['pointerup','pointerleave','pointercancel'].forEach(n=>e.addEventListener(n,()=>fn(false)))};
@@ -210,7 +210,7 @@ function aqua(){closeM();G.aq=true;const l=S.inv.slice();world.setMode('aqua');w
  l.forEach((x,i)=>{const f=FISH.find(y=>y.id===x.id),c=btn(`${f.name}${x.mut?' ['+x.mut+']':''} ${x.len}cm`,()=>pick(sel===i?-1:i));cb.push(c);chips.append(c)});
  const zr=h('div','btns');zr.append(btn('ZOOM +',()=>{world.azm=cl(world.azm*.8,.3,1.4)}),btn('ZOOM -',()=>{world.azm=cl(world.azm*1.25,.3,1.4)}),btn('TUTUP',closeAq));
  u.append(chips,act,h('p','','Tap ikan di dalam akuarium atau di daftar untuk melihat nama dan ukurannya. Geser layar untuk memutar kamera.'),zr)}
-function beginRide(co){closeM();const f=fishOf(co);if(world.startRide(f)){G.st='ride';G.f=null;RS.coins=RS.pearls=RS.gems=RS.combo=0;RS.dist=0;RS.ct=0;say(`Naik ${f.name}! Joystick/WASD untuk bergerak, SHIFT/BOOST untuk ngebut.`,3.2);sfx('splash')}}
+function beginRide(co){closeM();const f=fishOf(co);if(world.startRide(f)){G.st='ride';G.f=null;RS.coins=RS.pearls=RS.gems=RS.combo=0;RS.dist=0;RS.ct=0;say(`Naik ${f.name}! Joystick/WASD untuk bergerak, SHIFT/BOOST untuk ngebut. Tahan SELAM / NAIK (Q / E) untuk menyelam.`,3.2);sfx('splash')}}
 function rideMenu(){if(G.st!=='idle')return;const b=h('div'),mk=co=>{const f=fishOf(co),m=h('img');m.src=thumb(f,false,f.mut);m.style.cssText='width:84px;flex:none';const r=h('div','row');const inf=h('span','',`<b>${f.name}</b><small>${co.mut?'MUTASI '+co.mut+' | ':''}${f.rarity} | ${f.len} cm | ${f.weight} kg | kecepatan ${rideSpeed(f).toFixed(1)}</small>`);r.append(m,inf,btn('NAIKI',()=>beginRide(co)));return r};
  b.append(h('p','','Pilih ikan dari Tas untuk ditunggangi menjelajah sungai. Ikan besar lebih gagah, ikan langka/mutasi lebih cepat. Kumpulkan mutiara dan kristal untuk koin dan XP!'));
  S.inv.slice(0,40).forEach(co=>b.append(mk(co)));
@@ -231,6 +231,9 @@ APP.addEventListener('wheel',e=>{if(world.mode==='aqua')world.azm=cl((world.azm|
  const up=()=>{JOY.on=false;JOY.x=JOY.y=0;K.style.transform='translate(0,0)'};['pointerup','pointercancel','lostpointercapture'].forEach(n=>J.addEventListener(n,up))}
 {const B=$('#bBoost');B.addEventListener('pointerdown',e=>{e.preventDefault();unlock();G.boostBtn=true});['pointerup','pointerleave','pointercancel'].forEach(n=>B.addEventListener(n,()=>{G.boostBtn=false}))}
 $('#bHome').onclick=()=>{world.goHome();say('Berenang pulang ke dermaga...',1.6)};
+{$('#rbot .g').insertAdjacentHTML('beforeend','<label id="rolab">OKSIGEN</label><div class="bar"><i id="ro2" class="sta"></i></div>');
+ const rb=$('#rbot'),bD=lego(btn('SELAM',()=>{}),'#1d6fb8'),bU=lego(btn('NAIK',()=>{}),'#3aa36a');bD.style.minWidth=bU.style.minWidth='72px';rb.insertBefore(bU,$('#bHome'));rb.insertBefore(bD,bU);
+ const hold=(b,v)=>{b.addEventListener('pointerdown',e=>{e.preventDefault();unlock();G.dive=v});['pointerup','pointerleave','pointercancel'].forEach(n=>b.addEventListener(n,()=>{if(G.dive===v)G.dive=0}))};hold(bD,1);hold(bU,-1)}
 $('#bReel').addEventListener('pointerdown',e=>{e.preventDefault();unlock();tap()});
 $('#bAuto').onclick=()=>{if(G.st==='fight'&&!S.auto.on)return;S.auto.on=!S.auto.on;save();autoT=.5;say(S.auto.on?'Auto Mancing AKTIF':'Auto Mancing mati',1.5)};
 $('#bBack').onclick=()=>{const b=G.back;G.back=null;if(b)b()};
@@ -247,7 +250,7 @@ $('#bPhoto').onclick=()=>{const a=document.createElement('a');a.href=world.snap(
  world.onThunder=()=>{setTimeout(()=>sfx('thunder'),300+Math.random()*700);if(S.opt.shake)world.shake=.25};world.onMeteor=()=>{sfx('meteor');if(S.opt.shake)world.shake=Math.max(world.shake,.15)};
  $('#dock').append(lego(btn('NAIK IKAN',rideMenu),'#2bb5c9'));
  world.onItem=k=>{RS.combo++;RS.ct=4;const mu=Math.min(5,1+Math.floor(RS.combo/3)),base={p:3,g:15,c:0}[k]*mu;if(k==='c'){S.gem++;RS.gems++;addXp(10*mu);say(`KRISTAL +1  (x${mu})`,1)}else{S.coins+=base;RS.coins+=base;if(k==='p')RS.pearls++;addXp(k==='g'?4:1);say(`${k==='g'?'MUTIARA EMAS':'Mutiara'} +${base}`,.7)}sfx('tap',Math.min(1,RS.combo/9))};
- world.onRide=ev=>{if(ev==='mounted')sfx('ok');if(ev==='end'){G.st='idle';S.stats.ride=(S.stats.ride||0)+Math.round(RS.dist*.6);S.stats.pearls=(S.stats.pearls||0)+RS.pearls;save();say(`Turun dari ikan. Jarak ${Math.round(RS.dist*.6)} m | +${RS.coins} koin | ${RS.pearls} mutiara`,3.5)}};
+ world.onRide=ev=>{if(ev==='mounted')sfx('ok');if(ev==='o2low')say('OKSIGEN HABIS! Naik ke permukaan...',2.5);if(ev==='end')G.dive=0;if(ev==='end'){G.st='idle';S.stats.ride=(S.stats.ride||0)+Math.round(RS.dist*.6);S.stats.pearls=(S.stats.pearls||0)+RS.pearls;save();say(`Turun dari ikan. Jarak ${Math.round(RS.dist*.6)} m | +${RS.coins} koin | ${RS.pearls} mutiara`,3.5)}};
  hud();home();requestAnimationFrame(loop)})();
 
 if('serviceWorker' in navigator&&import.meta.env.PROD)addEventListener('load',()=>navigator.serviceWorker.register(import.meta.env.BASE_URL+'sw.js').catch(()=>{}));
