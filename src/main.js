@@ -112,17 +112,17 @@ function finish(){
  const bonus=Math.round(G.eMax*.3+(G.eN?G.eSum/G.eN*.2:0)),eM=Math.round(G.eMax);
  d.n++;if(rec)d.best=f.weight;d.muts=d.muts||[];if(mu&&!d.muts.includes(mu.n))d.muts.push(mu.n);S.stats.caught++;S.xp+=Math.round(5+f.v/10)+(isNew?30:0)+(mu?40:0)+bonus;
  let up=false;while(S.xp>=S.lv*120){S.xp-=S.lv*120;S.lv++;up=true}
- G.st='catch';G.ct=0;G.reel=false;G.cdur=auto?.8:Math.max([1.2,1.4,1.7,2,2.3,2.7][ix],mu?2.8:0);G.fx=ix;G.slow=!auto&&(ix>=3||mu)?.25:0;
- world.catchFx(f,ix);if(!auto&&(ix>=4||mu)&&S.opt.shake)world.shake=.5;if(!auto&&(ix>=5||mu))$('#cut').classList.add('on');
+ G.st='catch';G.ct=0;G.reel=false;G.cdur=auto?Math.max([3.2,3.5,4,4.6,5.2,6][ix],mu?6:0):Math.max([1.2,1.4,1.7,2,2.3,2.7][ix],mu?2.8:0);G.fx=ix;G.slow=auto?((ix>=2||mu)?.9:.5):((ix>=3||mu)?.25:0);
+ world.catchFx(f,ix);if((ix>=4||mu)&&S.opt.shake)world.shake=.5;if(ix>=5||mu)$('#cut').classList.add('on');
  if(mu||ix>=3)G.omenT=20;
- const bn=[];if(!auto){if(ix>=3)bn.push(`<div class="bn" style="background:${RC[f.rarity]}">${f.rarity.toUpperCase()}</div>`);if(mu){bn.push(`<div class="bn m" style="background:${mu.c}">MUTASI ${mu.n.toUpperCase()}</div>`);bn.push(`<div class="bn m" style="background:#3a1020;animation-delay:.7s">SUASANA MENCEKAM...</div>`)}}
+ const bn=[];{if(ix>=3)bn.push(`<div class="bn" style="background:${RC[f.rarity]}">${f.rarity.toUpperCase()}</div>`);if(mu){bn.push(`<div class="bn m" style="background:${mu.c}">MUTASI ${mu.n.toUpperCase()}</div>`);bn.push(`<div class="bn m" style="background:#3a1020;animation-delay:.7s">SUASANA MENCEKAM...</div>`)}}
  const B=$('#banner');B.innerHTML=bn.join('');B.hidden=!bn.length;
- if(!auto){sfx('catch',ix);if(mu)setTimeout(()=>sfx('mut'),250);if(up)setTimeout(()=>sfx('level'),900)}save();
+ {sfx('catch',ix);if(mu)setTimeout(()=>sfx('mut'),250);if(up)setTimeout(()=>sfx('level'),900)}save();
  const co={id:f.id,w:f.weight,len:f.len,val,r:f.rarity,mut:mu?mu.n:'',mk:mu?mu.k:''},done=()=>{stopViewer();closeM();reset();$('#cut').classList.remove('on');B.hidden=true};
  G.after=()=>{const b=h('div');b.append(startViewer(f),h('div','big',f.name),h('div','',`<span class="tag" style="background:${RC[f.rarity]}">${f.rarity.toUpperCase()}</span> ${mu?`<span class="tag" style="background:${mu.c}">MUTASI ${mu.n.toUpperCase()} x${mu.m}</span> `:''}${isNew?'<b>SPESIES BARU</b> ':''}${rec&&!isNew?'<b>REKOR BERAT</b>':''}`),
   h('div','row',`<span>Panjang ${f.len} cm</span><span>Berat ${f.weight} kg</span><span>Nilai ${val} koin</span>`),h('div','',`Bonus energi tap: +${bonus} XP (puncak ${eM}%)`),up?h('div','',`<b>LEVEL NAIK: ${S.lv}</b>`):h('span'));
   const bs=h('div','btns');bs.append(btn('JUAL',()=>{S.coins+=val;save();done()}),btn('SIMPAN',()=>{S.inv.push(co);save();done()}),btn('LEPAS',()=>{S.xp+=2;save();done()}),btn('PAMER',()=>{closeM();G.st='flex';G.back=()=>{G.st='result';G.after()}}));b.append(bs);modal('Tangkapan',b,true)};
- if(auto)G.after=()=>{if(S.auto.act==='simpan'&&S.inv.length<60)S.inv.push(co);else S.coins+=val;save();done()}}
+ if(auto)G.after=()=>{if(S.inv.length<60)S.inv.push(co);else S.coins+=val;save();autoT=3;done()}}
 
 /* ===== UI ===== */
 function modal(t,b,lite){M.innerHTML='';M.className=lite?'lite':'sheet';const p=h('div','panel');p.append(h('h2','',t),b);M.append(p);M.hidden=false;$('#hud').hidden=true;$('#dock').hidden=true}
@@ -134,7 +134,11 @@ function locs(){world.setRoom('locs',{locs:LOCS,sel:S.loc,lv:S.lv,unl:S.unl});co
 function dex(){const f0=FISH.find(f=>S.dex[f.id]);world.setRoom('dex',{fish:f0||FISH[0],dark:!f0});const b=h('div'),g=h('div','grid'),n=Object.keys(S.dex).length;b.append(h('p','',`Ditemukan ${n} / ${FISH.length}`));
  FISH.forEach(f=>{const d=S.dex[f.id],cd=h('div','card'),m=h('img');m.src=thumb(f,!d);cd.append(m);cd.onclick=()=>world.roomDex(f,!d);cd.style.cursor='pointer';
   cd.append(h('div','',d?`<b>${f.name}</b><br><span class="tag" style="background:${RC[f.rarity]}">${f.rarity}</span><br>${f.hab.map(x=>x.n).join(', ')}<br>Rekor ${d.best} kg | x${d.n}${d.muts&&d.muts.length?'<br>Mutasi '+d.muts.join(', '):''}`:'<b>???</b>'));g.append(cd)});
- b.append(g,btn('KEMBALI',home));modal('Koleksi',b)}
+ b.append(g,btn('INDEKS MUTASI',dexMut),btn('KEMBALI',home));modal('Koleksi',b)}
+function dexMut(){const f0=FISH.find(f=>S.dex[f.id]);world.setRoom('dex',{fish:f0||FISH[0],dark:!f0});const b=h('div');let tot=0,got=0;
+ const secs=Object.keys(MUT).map(k=>{const sec=h('div'),g=h('div','grid');let c=0;FISH.forEach(f=>{const d=S.dex[f.id],ok=d&&d.muts&&d.muts.includes(MUT[k].n);tot++;if(ok){got++;c++;const cd=h('div','card'),m=h('img');m.src=thumb(f,false,{k,...MUT[k]});cd.append(m,h('div','',`<b>${f.name}</b><br><span class="tag" style="background:${MUT[k].c}">${MUT[k].n.toUpperCase()}</span>`));g.append(cd)}});
+  sec.append(h('h3','',`Mutasi ${MUT[k].n} (${c}/${FISH.length})`),c?g:h('p','','Belum ada.'));return sec});
+ b.append(h('p','',`Mutasi ditemukan ${got} / ${tot}`),...secs,btn('KEMBALI',dex));modal('Indeks Mutasi',b)}
 function opts(msg=''){world.setRoom('opts',{opt:S.opt});const b=h('div');[['shake','Camera shake'],['sound','Suara'],['fx','Partikel penuh'],['music','Musik latar']].forEach(([k,l])=>{const r=h('div','row',`<span>${l}</span>`);r.append(btn(S.opt[k]?'AKTIF':'MATI',()=>{S.opt[k]=!S.opt[k];setOpt(S.opt);save();opts()},S.opt[k]?'on':''));b.append(r)});
  const WL=['acak','clear','rain','storm','meteor'],wr=h('div','row','<span>Cuaca</span>');wr.append(btn((S.opt.wx||'acak')==='acak'?'ACAK':WXN[S.opt.wx].toUpperCase(),()=>{S.opt.wx=WL[(WL.indexOf(S.opt.wx||'acak')+1)%5];save();opts()}));b.append(wr);
  const cr=h('div','row','<span>Kode redeem</span>'),inp=h('input');inp.placeholder='Masukkan kode';inp.autocapitalize='characters';
@@ -156,7 +160,7 @@ function shop(tab){if(tab==='sell')world.setRoom('bag',{list:S.inv.slice(0,8).ma
   AUTOS.forEach(p=>{const perm=Number(p.hours)===0,cost=perm?p.gem_price:p.coin_price,have=perm?S.gem:S.coins,ok=S.unl||have>=cost;
    row(p.name,`${p.desc} | ${cost} ${perm?'Kristal':'koin'}`,[btn(ok?`BELI ${cost}`:(perm?'TOP UP DULU':'KOIN KURANG'),()=>{if(!ok){if(perm)return shop('topup');return alert('Koin kurang.')}
     if(!S.unl){if(perm)S.gem-=cost;else S.coins-=cost}if(perm)S.auto.perm=true;else S.auto.until=Math.max(Date.now(),S.auto.until)+p.hours*3600e3;save();shop('auto')})])});
-  row('Hasil Auto',`Saat ini: ${A.act==='jual'?'JUAL otomatis':'SIMPAN ke tas'}`,[btn('GANTI',()=>{A.act=A.act==='jual'?'simpan':'jual';save();shop('auto')})])}
+  row('Hasil Auto','Ikan otomatis masuk Tas dan Akuarium (tas penuh 60: dijual)',[])}
  if(tab==='topup'){b.append(h('p','',`Kristal: ${S.unl?'UNLIMITED':S.gem}. Mode simulasi: belum ada pembayaran sungguhan.`));TOPUPS.forEach(p=>row(p.label,`${p.gems} Kristal | ${p.price_label}`,[btn('TOP UP',()=>{if(confirm(`SIMULASI: tambah ${p.gems} Kristal tanpa pembayaran?`)){S.gem+=Number(p.gems);save();shop('topup')}})]))}
  b.append(btn('KEMBALI',home));modal('Toko',b)}
 
@@ -169,7 +173,7 @@ function hud(){
  if(bt){$('#gl1').textContent='WAKTU STRIKE';f1.style.width=(100-G.t/G.bw*100)+'%';f1.className=''}else{$('#gl1').textContent='POWER LEMPAR';f1.style.width=(pw?G.pw:0)+'%';f1.className=G.pw>80?'warn':''}
  $('#gl2').textContent=`PROGRESS TANGKAP ${Math.round(G.prog)}%`;
  f2.style.width=G.prog+'%';f2.className='';f3.style.width=(ft?G.en:0)+'%';f3.className=G.en>=66?'warn':'sta';$('#gl3').textContent=G.en>=66?'ENERGI TAP - FRENZY x2.2':G.en>=33?'ENERGI TAP x1.5':'ENERGI TAP';
- $('#bCast').hidden=!(s==='idle'||s==='charge');$('#bStrike').hidden=!(s==='wait'||s==='bite');$('#bReel').hidden=!ft;const ba=$('#bAuto');ba.hidden=!autoActive()||!!G.aq||s==='flex'||busy();ba.textContent=S.auto.on?'AUTO: ON':'AUTO: OFF';ba.classList.toggle('on',!!S.auto.on);
+ $('#bCast').hidden=!(s==='idle'||s==='charge');$('#bStrike').hidden=!(s==='wait'||s==='bite');$('#bReel').hidden=!ft;const ba=$('#bAuto');ba.hidden=!autoActive()||!!G.aq||s==='flex'||busy()||(ft&&!S.auto.on);ba.textContent=S.auto.on?'AUTO: ON':'AUTO: OFF';ba.classList.toggle('on',!!S.auto.on);
  const sw=$('#swipe');sw.hidden=!(ft&&G.swT>0);if(!sw.hidden){sw.dataset.d=G.swDir;$('#swt').textContent={L:'GESER KIRI',R:'GESER KANAN',U:'GESER ATAS',D:'GESER BAWAH'}[G.swDir];$('#swb').style.width=(G.swT/G.swMax*100)+'%'}
  $('#hud').hidden=!!G.aq||s==='flex'||busy();$('#dock').hidden=!(s==='idle'&&!busy()&&!G.aq);$('#flexui').hidden=s!=='flex'}
 
@@ -200,7 +204,7 @@ APP.addEventListener('pointermove',e=>{if(!pd)return;const dx=e.clientX-pd.x,dy=
  else if(world.mode==='aqua')world.azd=cl((world.azd||0)+(e.movementX||0)*.006,-1.2,1.2)});
 ['pointerup','pointercancel'].forEach(n=>APP.addEventListener(n,()=>{pd=null}));
 $('#bReel').addEventListener('pointerdown',e=>{e.preventDefault();unlock();tap()});
-$('#bAuto').onclick=()=>{S.auto.on=!S.auto.on;save();autoT=.5;say(S.auto.on?'Auto Mancing AKTIF':'Auto Mancing mati',1.5)};
+$('#bAuto').onclick=()=>{if(G.st==='fight'&&!S.auto.on)return;S.auto.on=!S.auto.on;save();autoT=.5;say(S.auto.on?'Auto Mancing AKTIF':'Auto Mancing mati',1.5)};
 $('#bBack').onclick=()=>{const b=G.back;G.back=null;if(b)b()};
 $('#bPhoto').onclick=()=>{const a=document.createElement('a');a.href=world.snap();a.download='tidal-tales-pamer.png';a.click()};
 (async()=>{
