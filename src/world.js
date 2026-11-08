@@ -232,7 +232,7 @@ export class World{
   if(st==='charge')look.z=-5-G.pw*.05;
   if(st==='fight'&&this.fm){look.set(this.fm.position.x*.4,.2,(PZ+this.fm.position.z)/2-2)}
   if(holdMode&&this.fm){const L=this.fL,tf=Math.tan(this.cam.fov*Math.PI/360),d=Math.max(3.4,L*1.35*1.15/(2*tf*this.cam.aspect),Math.max(2.4,L*.6+1.7)/(2*tf)),p=st==='catch'?Math.min(1,G.ct/G.cdur):1,hi=this.ix>=3||!!this.mu,th=hi?[.22,.45,.7]:[.4],si=p>=1?th.length:th.filter(x=>p>x).length,hp=this.hp||V(0,1,PZ);
-   if(si<th.length){const k=hi?si:0;base.set(...[[hp.x+1.6,.4,hp.z+2.4],[hp.x-3,hp.y+.2,hp.z+.6],[hp.x+2,hp.y+1.7,hp.z+3.2]][k]);look.set(hp.x,hp.y+.1,hp.z);if(si!==this.shot){this.shot=si;this.cc.copy(base);this.cl.copy(look)}}
+   if(si<th.length){const k=hi?si:0;base.set(...[[hp.x+2.6,Math.max(1.5,hp.y+.5),hp.z+2.6],[hp.x-2.8,Math.max(1.7,hp.y+.8),hp.z+2],[hp.x+1,Math.max(2.2,hp.y+1.5),hp.z+3.4]][k]);look.set(hp.x,hp.y+.1,hp.z);if(si!==this.shot){this.shot=si;this.cc.copy(base);this.cl.copy(look)}}
    else{base.set(0,1.5+Math.min(.7,L*.12),PZ+.55+d);look.set(0,1.25,PZ);this.shot=si}}
   this.cc.lerp(base,Math.min(1,4*dt));this.cl.lerp(look,Math.min(1,4*dt));this.cam.position.copy(this.cc);
   if(this.wx==='storm'){this.cam.position.x+=Math.sin(t*1.3)*.04;this.cam.position.y+=Math.sin(t*1.9)*.03}
