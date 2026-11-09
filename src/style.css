@@ -81,3 +81,42 @@ button:disabled{filter:grayscale(.6);opacity:.55}
 #aqlab{position:absolute;transform:translate(-50%,-100%);background:#153b78f2;border:3px solid #ffe08a;border-radius:8px;padding:6px 10px;font-size:12px;text-align:center;pointer-events:none;white-space:nowrap;z-index:2}
 #aqui{max-height:38%}
 .panel .row img{border-radius:6px;background:#0f2a50}
+
+
+/* ===== loading screen beranimasi ===== */
+#boot{position:absolute;inset:0;z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:linear-gradient(#031640 0%,#0a3d91 48%,#1272d8 100%);overflow:hidden;transition:opacity .7s ease,transform .8s ease;touch-action:none}
+#boot.out{opacity:0;transform:scale(1.08);pointer-events:none}
+.b-rays{position:absolute;left:50%;top:40%;width:220vmax;height:220vmax;margin:-110vmax;background:repeating-conic-gradient(rgba(120,200,255,.11) 0 7deg,transparent 7deg 22deg);animation:bspin 40s linear infinite;-webkit-mask-image:radial-gradient(circle,#000 4%,transparent 52%);mask-image:radial-gradient(circle,#000 4%,transparent 52%)}
+.b-logo{position:relative;z-index:3;width:min(56vmin,340px);height:auto;filter:drop-shadow(0 14px 28px rgba(0,0,0,.5));animation:bfloat 3.2s ease-in-out infinite}
+@keyframes bfloat{0%,100%{transform:translateY(0) rotate(-2deg) scale(1)}50%{transform:translateY(-14px) rotate(2deg) scale(1.03)}}
+@keyframes bspin{to{transform:rotate(360deg)}}
+.b-bub i{position:absolute;bottom:-40px;border-radius:50%;border:2px solid rgba(190,235,255,.6);background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.55),rgba(255,255,255,0) 60%);animation:brise linear infinite}
+@keyframes brise{0%{transform:translate(0,0)}50%{transform:translate(16px,-60vh)}100%{transform:translate(-8px,-120vh)}}
+.b-fish{position:absolute;width:84px;opacity:.85;z-index:1}.b-fish svg{width:100%;height:auto;display:block;overflow:visible}.b-fish path{fill:#7fd1ff}
+.b-fish .fw{transform-origin:20% 50%;animation:bwig .5s ease-in-out infinite alternate}
+@keyframes bwig{from{transform:rotate(-7deg) skewX(-4deg)}to{transform:rotate(7deg) skewX(4deg)}}
+.f1{bottom:22%;left:0;animation:bswim 11s linear infinite}.f2{bottom:30%;left:0;width:56px;opacity:.6;animation:bswimr 15s linear infinite;animation-delay:-5s}.f3{bottom:15%;left:0;width:120px;opacity:.5;animation:bswim 19s linear infinite;animation-delay:-9s}.f3 path{fill:#b695ff}
+@keyframes bswim{from{transform:translateX(-30vw)}to{transform:translateX(130vw)}}
+@keyframes bswimr{from{transform:translateX(130vw) scaleX(-1)}to{transform:translateX(-30vw) scaleX(-1)}}
+.b-wave{position:absolute;left:0;bottom:0;width:200%;height:20vh;z-index:2;animation:bwave 9s linear infinite}
+.b-wave.w1{fill:rgba(60,160,235,.55)}.b-wave.w2{fill:rgba(30,110,200,.7);height:15vh;animation-duration:6s;animation-direction:reverse}.b-wave.w3{fill:#0b4fa8;height:9vh;animation-duration:4.5s}
+@keyframes bwave{to{transform:translateX(-50%)}}
+.b-ui{position:relative;z-index:4;display:flex;flex-direction:column;align-items:center;gap:8px;width:min(80vw,460px)}
+.b-bar{width:100%;height:20px;border-radius:12px;background:#031640aa;border:3px solid #0d2a57;box-shadow:inset 0 3px 0 rgba(0,0,0,.35);overflow:hidden}
+#bfill{display:block;position:relative;height:100%;width:0;border-radius:9px;background:repeating-linear-gradient(115deg,#ffd35a 0 14px,#ffb62e 14px 28px);background-size:56px 100%;animation:bstripe .8s linear infinite;transition:width .45s ease}
+#bfill::after{content:"";position:absolute;right:2px;top:50%;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:inset 0 0 0 3px #e74c3c;transform:translateY(-50%);animation:bbob .6s ease-in-out infinite alternate}
+@keyframes bstripe{to{background-position:56px 0}}@keyframes bbob{to{transform:translateY(-70%)}}
+.b-row{display:flex;justify-content:space-between;width:100%;font-weight:800;font-size:14px;color:#fff;text-shadow:0 2px 0 #031640}
+#btip{min-height:3em;text-align:center;font-size:13px;color:#cfe8ff;opacity:0;text-shadow:0 1px 0 #031640}#btip.in{animation:btipin .6s ease forwards}
+@keyframes btipin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ===== sinematik tangkapan & suasana mencekam ===== */
+#cine{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .25s}#cine.on{opacity:1}
+#cine .bt,#cine .bb{position:absolute;left:0;right:0;height:0;background:#000;transition:height .6s cubic-bezier(.2,.8,.2,1)}#cine .bt{top:0}#cine .bb{bottom:0}#cine.on .bt,#cine.on .bb{height:11%}
+#cine .rays{position:absolute;left:50%;top:46%;width:240vmax;height:240vmax;margin:-120vmax;background:repeating-conic-gradient(color-mix(in srgb,var(--c,#fff) 40%,transparent) 0 4deg,transparent 4deg 14deg);animation:bspin 16s linear infinite;-webkit-mask-image:radial-gradient(circle,transparent 6%,#000 38%,transparent 66%);mask-image:radial-gradient(circle,transparent 6%,#000 38%,transparent 66%);opacity:0;transition:opacity .9s .9s}
+#cine.on .rays{opacity:.5}
+#cine .vg{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 42%,color-mix(in srgb,var(--c,#000) 38%,#000) 100%);opacity:.75}
+#omenfx{position:absolute;inset:0;pointer-events:none;opacity:var(--om,0);background:radial-gradient(ellipse at 50% 45%,transparent 36%,rgba(12,0,10,.55) 76%,rgba(0,0,0,.88) 100%);animation:ominous 5s ease-in-out infinite}
+#omenfx::after{content:"";position:absolute;inset:0;background:#cfd8ff;opacity:calc(var(--fl,0)*.32)}
+@keyframes ominous{0%,100%{filter:brightness(1)}50%{filter:brightness(.78)}}
+.mlogo{float:right;width:84px;height:84px;object-fit:contain;margin:-6px 0 4px 8px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.4))}
