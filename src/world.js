@@ -360,8 +360,8 @@ export class World{
   if(S.loc!==this.loc)this.build(S.loc);if(tod!==this.tod)this.setTod(tod);
   {const nw=performance.now(),rd=Math.min(100,nw-(this._pn||nw));this._pn=nw;this.fa=(this.fa||16.7)*.93+rd*.07;if(this.t>4){this._at=(this._at||0)+rd;
    if(this._at>1500){this._at=0;const set=()=>{this.r.setPixelRatio(this.dpr);this.r.setSize(this.w||1,this.h||1,false);this._ok=0};
-    if(this.fa>23&&this.dpr>.76){this.dpr=Math.max(.75,this.dpr-.25);set()}else if(this.fa>30&&this.dpr<=.76)this.lowAuto=true;
-    else if(this.fa<14.5){this._ok=(this._ok||0)+1;if(this._ok>4&&this.dpr<this.dprMax){this.dpr=Math.min(this.dprMax,this.dpr+.25);set()}}else this._ok=0}}}
+    if(this.fa>23&&this.dpr>.76){this.dpr=Math.max(.75,this.dpr-.25);set();this._hold=nw+25000;this._dn=(this._dn||0)+1}else if(this.fa>30&&this.dpr<=.76)this.lowAuto=true;
+    else if(this.fa<14.5){this._ok=(this._ok||0)+1;if(this._ok>4&&this.dpr<this.dprMax&&nw>(this._hold||0)&&(this._dn||0)<3){this.dpr=Math.min(this.dprMax,this.dpr+.25);set()}}else this._ok=0}}}
   this.low=!S.opt.fx||!!this.lowAuto;this.sk=!!S.opt.shake;const t=(this.t+=dt),st=G.st,por=this.cam.aspect<1;if(this.mode==='aqua'){this.frameAqua(dt,t);return}if(this.mode==='room'){this.rooms.frame(dt,t);this.updSmoke(dt);this.r.render(this.s,this.cam);return}
   {this.om+=(this.omT-this.om)*Math.min(1,dt*(this.omT>this.om?1.5:1.6));if(Math.abs(this.omT-this.om)<.004)this.om=this.omT;if(Math.abs(this.om-this._omA)>.03||(this.om===this.omT&&this._omA!==this.om)){this._omA=this.om;this.applyEnv()}}
   if((this.wf=(this.wf||0)+1)%2===0||!this.wdone){this.wdone=1;const a=this.wp.array,b=this.wb;for(let i=0;i<a.length;i+=3){const x=b[i],z=b[i+2];a[i+1]=(Math.sin(x*.45+t*1.3)*.07+Math.cos(z*.38+t*1.0)*.07+Math.sin((x+z)*.2+t*.6)*.05)*(this.wamp||1);const cc=Math.min(1,.82+a[i+1]*1.7+Math.max(0,Math.sin(x*.9-t*1.7+z*.6))*.06),ci=(i/3)*3,ca=this.wc.array;ca[ci]=ca[ci+1]=cc;ca[ci+2]=Math.min(1,cc+.04)}this.wp.needsUpdate=true;this.wc.needsUpdate=true}
