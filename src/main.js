@@ -205,8 +205,8 @@ function hud(){
 function pushInput(dt){let x=JOY.x,y=JOY.y;if(!JOY.on){x=(KEYS.ArrowRight||KEYS.KeyD?1:0)-(KEYS.ArrowLeft||KEYS.KeyA?1:0);y=(KEYS.ArrowDown||KEYS.KeyS?1:0)-(KEYS.ArrowUp||KEYS.KeyW?1:0)}
  world.inp.x=x;world.inp.y=y;world.inp.boost=!!(KEYS.ShiftLeft||KEYS.ShiftRight||(G.st==='ride'&&KEYS.Space)||G.boostBtn);world.inp.dive=G.st==='ride'?(G.dive||((KEYS.KeyQ?1:0)-(KEYS.KeyE?1:0))):0;
  if(G.st==='ride'){RS.ct-=dt;if(RS.ct<=0)RS.combo=0;if(world.rd)RS.dist=world.rd.dist}}
-let last=0,errT=0;function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;
- try{pushInput(dt);if(G.slow>0)G.slow-=dt;let sd=G.slow>0?dt*.3:dt;if(G.st==='catch'&&G.hi){const p=G.ct/G.cdur;sd=dt*(p<.08?1:p<.32?.45:p<.46?.7:1)}if(!busy()||G.st==='result')update(sd);world.frame(sd,G,S,R(),tod);fxDom()}
+let last=0,errT=0,dts=.016;function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;
+ try{pushInput(dt);if(G.slow>0)G.slow-=dt;let sd=G.slow>0?dt*.3:dt;if(G.st==='catch'&&G.hi){const p=G.ct/G.cdur;sd=dt*(p<.08?1:p<.32?.45:p<.46?.7:1)}if(!busy()||G.st==='result')update(sd);dts+=(sd-dts)*.4;world.frame(dts,G,S,R(),tod);fxDom()}
  catch(e){console.error(e);if(performance.now()-errT>4000){errT=performance.now();const ln=e&&e.stack?String(e.stack).split('\n')[1]||'':'';say('ERROR: '+(e&&e.message||e)+' '+ln.trim().slice(-60),6)}
   if(world.rd){try{world.endRide()}catch(_){world.rd=null}G.st='idle';G.dive=0}}
  requestAnimationFrame(loop)}
