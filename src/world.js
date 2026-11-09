@@ -9,7 +9,7 @@ const spr=(o,k,tg,dt,w=14,z=.7)=>{const u=o.userData,v=u.v||(u.v={});let vv=v[k]
 export class World{
  constructor(cv){
   this.cv=cv;this.t=0;this.shake=0;this.low=false;this.fish=[];this.ix=0;this.cs=V(0,-1,0);
-  this.r=new THREE.WebGLRenderer({canvas:cv,antialias:(devicePixelRatio||1)<1.75,powerPreference:'high-performance'});this.dprMax=Math.min(devicePixelRatio||1,1.75);this.dpr=this.dprMax;this.r.setPixelRatio(this.dpr);
+  this.r=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});this.dprMax=Math.min(devicePixelRatio||1,2);this.dpr=this.dprMax;this.r.setPixelRatio(this.dpr);
   const s=this.s=new THREE.Scene();this.cam=new THREE.PerspectiveCamera(52,1,.1,160);
   this.hemi=new THREE.HemisphereLight('#ffffff','#445566',1);this.sun=new THREE.DirectionalLight('#ffffff',2);this.sun.position.set(-6,10,6);s.add(this.hemi,this.sun);
   const wg=new THREE.PlaneGeometry(140,140,52,52);wg.rotateX(-Math.PI/2);this.wp=wg.attributes.position;wg.setAttribute('color',new THREE.BufferAttribute(new Float32Array(wg.attributes.position.count*3).fill(1),3));this.wc=wg.attributes.color;this.wb=Float32Array.from(this.wp.array);
@@ -323,14 +323,14 @@ export class World{
     if(p>=1){P.position.copy(R.to);P.scale.setScalar(1);this.hdc=0;this.hd=0;this.endRide();return}}}
   else seat(P.position);
   if(R.ph==='dis'){R.x+=R.fx*dt*1.2;R.z+=R.fz*dt*1.2;m.scale.setScalar(Math.max(.01,L*(1-Math.min(1,R.sink/.95))))}
-  m.position.set(R.x,fy-(R.ph==='ride'||R.ph==='mount'?0:R.sink*.6),R.z);m.rotation.y=R.yaw;m.rotation.x=R.roll;R.pit+=(-cl(R.dv/2.4,-1,1)*.5-R.pit)*Math.min(1,dt*5);m.rotation.z=(R.boost?.1:Math.sin(t*2)*.03)+R.pit;
+  m.position.set(R.x,fy-(R.ph==='ride'||R.ph==='mount'?0:R.sink*.6),R.z);m.rotation.y=R.yaw;m.rotation.x=R.roll;R.pit+=(-cl(R.dv/2.4,-1,1)*.5-R.pit)*Math.min(1,dt*5);R.bz=(R.bz||0)+((R.boost?1:0)-(R.bz||0))*Math.min(1,dt*6);m.rotation.z=R.bz*.1+(1-R.bz)*Math.sin(t*2)*.03+R.pit;
   if(R.dep>.5){R.bt-=dt;if(R.bt<=0){R.bt=.2;this.head.getWorldPosition(this._hp=this._hp||V(0,0,0));this.bubbleAt(this._hp,1)}}
   animateFish(m,t,.25+Math.min(1,(R.sp||0)/10)*.9);
   if(m.userData.mats&&(R.f.mut||RN.indexOf(R.f.rarity)>=3))m.userData.mats.forEach(q=>{q.emissiveIntensity=q.userData.e0*(1+.5*Math.sin(t*4))});
   if(R.f.mut&&Math.random()<dt*10)this.smoke(V(R.x-R.fx*L*.4,fy+.2,R.z-R.fz*L*.4),R.f.mut.c,1,.6);
   // pose
   const ps=P.scale.x,sp1=Math.min(1,(R.sp||0)/10);P.rotation.y=Math.atan2(-R.fx,-R.fz);
-  this.tb.rotation.x=-.1-sp1*.28-(R.boost?.12:0);this.tb.rotation.z=R.roll*.6;this.head.rotation.x=.1+sp1*.2;this.head.rotation.y=0;
+  this.tb.rotation.x=-.1-sp1*.28-R.bz*.12;this.tb.rotation.z=R.roll*.6;this.head.rotation.x=.1+sp1*.2;this.head.rotation.y=0;
   this.knees.forEach(kn=>kn.rotation.x=-1.0);this.legs.forEach((l,k)=>{l.rotation.x=1.1;l.rotation.z=(k?1:-1)*(.4+Math.sin(t*3+k)*.04)});
   const fx=R.fx,fz=R.fz,sx=-fz,sz=fx;this.rideH.forEach((h,k)=>{const sg=k?-1:1;h.set(R.x+fx*(L*.05+.32*ps/.5*.5)+sx*sg*.17*ps/.5*.5,fy+R.top+.08,R.z+fz*(L*.05+.32*ps/.5*.5)+sz*sg*.17*ps/.5*.5)});
   // items anim
@@ -360,8 +360,9 @@ export class World{
   if(S.loc!==this.loc)this.build(S.loc);if(tod!==this.tod)this.setTod(tod);
   {const nw=performance.now(),rd=Math.min(100,nw-(this._pn||nw));this._pn=nw;this.fa=(this.fa||16.7)*.93+rd*.07;if(this.t>4){this._at=(this._at||0)+rd;
    if(this._at>1500){this._at=0;const set=()=>{this.r.setPixelRatio(this.dpr);this.r.setSize(this.w||1,this.h||1,false);this._ok=0};
-    if(this.fa>23&&this.dpr>.76){this.dpr=Math.max(.75,this.dpr-.25);set();this._hold=nw+25000;this._dn=(this._dn||0)+1}else if(this.fa>30&&this.dpr<=.76)this.lowAuto=true;
-    else if(this.fa<14.5){this._ok=(this._ok||0)+1;if(this._ok>4&&this.dpr<this.dprMax&&nw>(this._hold||0)&&(this._dn||0)<3){this.dpr=Math.min(this.dprMax,this.dpr+.25);set()}}else this._ok=0}}}
+    if(this.fa>32&&this.dpr>1.3){this._bad=(this._bad||0)+1;if(this._bad>=3&&(this._dn||0)<4){this.dpr=Math.max(1.25,this.dpr-.25);set();this._hold=nw+15000;this._dn=(this._dn||0)+1;this._bad=0}}
+    else if(this.fa>38&&this.dpr<=1.3)this.lowAuto=true;
+    else{this._bad=0;if(this.fa<19&&this.dpr<this.dprMax&&nw>(this._hold||0)){this._ok=(this._ok||0)+1;if(this._ok>5){this.dpr=Math.min(this.dprMax,this.dpr+.25);set()}}else this._ok=0}}}}
   this.low=!S.opt.fx||!!this.lowAuto;this.sk=!!S.opt.shake;const t=(this.t+=dt),st=G.st,por=this.cam.aspect<1;if(this.mode==='aqua'){this.frameAqua(dt,t);return}if(this.mode==='room'){this.rooms.frame(dt,t);this.updSmoke(dt);this.r.render(this.s,this.cam);return}
   {this.om+=(this.omT-this.om)*Math.min(1,dt*(this.omT>this.om?1.5:1.6));if(Math.abs(this.omT-this.om)<.004)this.om=this.omT;if(Math.abs(this.om-this._omA)>.03||(this.om===this.omT&&this._omA!==this.om)){this._omA=this.om;this.applyEnv()}}
   if((this.wf=(this.wf||0)+1)%2===0||!this.wdone){this.wdone=1;const a=this.wp.array,b=this.wb;for(let i=0;i<a.length;i+=3){const x=b[i],z=b[i+2];a[i+1]=(Math.sin(x*.45+t*1.3)*.07+Math.cos(z*.38+t*1.0)*.07+Math.sin((x+z)*.2+t*.6)*.05)*(this.wamp||1);const cc=Math.min(1,.82+a[i+1]*1.7+Math.max(0,Math.sin(x*.9-t*1.7+z*.6))*.06),ci=(i/3)*3,ca=this.wc.array;ca[ci]=ca[ci+1]=cc;ca[ci+2]=Math.min(1,cc+.04)}this.wp.needsUpdate=true;this.wc.needsUpdate=true}
