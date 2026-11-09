@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {makeFish,animateFish,RC,RN} from './fish3d.js';
+import {makeFish,animateFish,disposeFish,RC,RN} from './fish3d.js';
 const BX=600,TC={Starter:'#8a6a44',Common:'#5f9a4a',Rare:'#243a5c',Epic:'#2a6fa8',Legendary:'#14181f'};
 const mm=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.7,flatShading:true,...o});
 const bx=(w,h,d)=>new THREE.BoxGeometry(w,h,d),cy=(a,b,h,s=10)=>new THREE.CylinderGeometry(a,b,h,s);
@@ -9,7 +9,7 @@ export class Rooms{
   ad(this.root,bx(40,.3,24),mm('#2b3446'),0,-.15,0);ad(this.root,bx(40,14,.3),mm('#1d2740'),0,7,-7);
   [['#d1493f',-8],['#e9b52f',-4],['#3f9e6e',0],['#2f6fb0',4],['#7b4fb8',8]].forEach(([c,x])=>ad(this.root,bx(3.6,.5,.3),mm(c),x,6,-6.8));
   const l1=new THREE.PointLight('#fff3d6',1.6,34);l1.position.set(0,7,6);const l2=new THREE.PointLight('#7fb6ff',.9,26);l2.position.set(-7,3,3);this.root.add(l1,l2)}
- show(type,d){if(this.cur)this.root.remove(this.cur);const G=this.cur=new THREE.Group();this.root.add(G);this.type=type;this.d=d||{};this.any={};this['b_'+type](G,this.d)}
+ show(type,d){if(this.cur){this.root.remove(this.cur);disposeFish(this.cur)}const G=this.cur=new THREE.Group();this.root.add(G);this.type=type;this.d=d||{};this.any={};this['b_'+type](G,this.d)}
  frame(dt,t){const w=this.w,c=this.cfg;if(!c)return;if(this['a_'+this.type])this['a_'+this.type](t,dt);const p=w.cam.aspect<1?c.pp:c.p;
   w.cam.position.set(BX+p[0]+Math.sin(t*.3)*.3,p[1]+Math.sin(t*.4)*.06,p[2]);w.cam.lookAt(BX+c.l[0],c.l[1],c.l[2])}
  b_shop(G,d){const gr=d.gear||{},cat=this.any.cat={};this.tab=d.tab;this.cfg={p:[0,2.8,7.2],pp:[0,3.2,10.5],l:[0,2,0]};
@@ -38,7 +38,7 @@ export class Rooms{
  a_bag(t){this.any.fl.forEach((m,i)=>animateFish(m,t+i,.25));this.any.nd.rotation.z=Math.sin(t*1.5)*.6}
  b_dex(G,d){this.cfg={p:[0,3.4,6.2],pp:[0,3.8,9],l:[0,2,0]};ad(G,cy(1.3,1.5,.9,18),mm('#d8d2c0'),0,.45,0);ad(G,bx(.6,6,.6),mm('#7a1f2b'),-5,3,-5);ad(G,bx(.6,6,.6),mm('#7a1f2b'),5,3,-5);
   this.any.rg=ad(G,new THREE.TorusGeometry(1.35,.06,6,36).rotateX(Math.PI/2),new THREE.MeshBasicMaterial({color:'#555b66'}),0,.95,0);this.dexFish(d.fish,d.dark)}
- dexFish(f,dark){const G=this.cur;if(!G||this.type!=='dex'||!f)return;if(this.any.fm)G.remove(this.any.fm);const m=makeFish(f,dark,null);m.scale.setScalar(2.2);G.add(m);this.any.fm=m;this.any.glow=!dark&&RN.indexOf(f.rarity)>=3;this.any.rg.material.color.set(dark?'#555b66':RC[f.rarity])}
+ dexFish(f,dark){const G=this.cur;if(!G||this.type!=='dex'||!f)return;if(this.any.fm){G.remove(this.any.fm);disposeFish(this.any.fm)}const m=makeFish(f,dark,null);m.scale.setScalar(2.2);G.add(m);this.any.fm=m;this.any.glow=!dark&&RN.indexOf(f.rarity)>=3;this.any.rg.material.color.set(dark?'#555b66':RC[f.rarity])}
  a_dex(t){const m=this.any.fm;if(!m)return;m.rotation.y=t*.7;m.position.y=2.3+Math.sin(t*1.6)*.1;animateFish(m,t,.5);if(this.any.glow&&m.userData.mats)m.userData.mats.forEach(x=>{x.emissiveIntensity=x.userData.e0*(1+.5*Math.sin(t*4))})}
  b_locs(G,d){this.cfg={p:[0,4.6,6.4],pp:[0,5.8,9.8],l:[0,.6,0]};const L=d.locs||[];ad(G,bx(11,.5,4.6),mm('#6b4a2a'),0,.25,0);ad(G,bx(10.6,.06,4.3),mm('#d9c8a0'),0,.53,0);
   const isl=this.any.isl=[];L.forEach((l,i)=>{const lock=!d.unl&&d.lv<l.lv,g=new THREE.Group();g.position.set(-4+i*2,.56,0);G.add(g);isl.push(g);
