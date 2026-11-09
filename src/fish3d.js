@@ -19,7 +19,7 @@ export function makeFish(f,dark=false,mut=null){
  const sk=f.rarity==='Secret'&&!/behemoth/.test(n)?(/kameleon/.test(n)?'prisma':/hantu/.test(n)?'ghost':/petir/.test(n)?'storm':'nebula'):'';
  const kind=/behemoth/.test(n)?'behemoth':/buntal/.test(n)?'puffer':/kuda laut/.test(n)?'horse':/ubur/.test(n)?'jelly':/mola/.test(n)?'mola':/penyu/.test(n)?'turtle':/manta/.test(n)?'ray':/gurita/.test(n)?'octo':/belut|sidat|naga|leviathan/.test(n)?'eel':/paus/.test(n)?'whale':/hiu/.test(n)?'shark':/marlin|barracuda|tuna|toman|belida|arwana/.test(n)?'torp':/lele|patin|gabus/.test(n)?'cat':'fish';
  const D={fish:[.5,.21,.1],torp:[.5,.13,.09],eel:[.5,.05,.05],ray:[.32,.04,.3],octo:[.22,.22,.22],whale:[.5,.2,.17],shark:[.5,.14,.12],cat:[.5,.13,.14],behemoth:[.5,.2,.15],puffer:[.3,.27,.27],horse:[.13,.3,.1],jelly:[.22,.17,.22],mola:[.3,.33,.07],turtle:[.3,.1,.27]}[kind];
- const sp=(w=10,hh=7)=>new THREE.SphereGeometry(1,w,hh),seg=/kristal/.test(n)?[5,4]:kind==='behemoth'?[7,5]:[12,9];
+ const sp=(w=10,hh=7)=>new THREE.SphereGeometry(1,w,hh),seg=/kristal/.test(n)?[5,4]:kind==='behemoth'?[7,5]:[18,12];
  const add=(geo,m,x,y,z,sx=1,sy=1,sz=1,p=g)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);p.add(o);return o};
  const u=root.userData={tails:[],fins:[],fr:.7,fa:.25,mats:[],kind,dy:D[1],ph:Math.random()*6},sy=kind==='fish'||kind==='cat'?D[1]/.2:Math.max(.35,D[1]/.13*.9),sc=pts=>pts.map(p=>[p[0],p[1]*sy]);
  const pv=new THREE.Group();pv.position.x=D[0]*.42;root.add(pv);g.position.x=-D[0]*.42;pv.add(g);u.body=pv;
@@ -91,13 +91,29 @@ export function makeFish(f,dark=false,mut=null){
    if(sk==='ghost'){const o=.5+.28*Math.sin(t*1.7);u.mats.forEach(q=>{q.transparent=true;q.opacity=o+.2})}
    if(arc){const a=arc.geometry.attributes.position;let j=0;for(let b=0;b<2;b++){let px=-.5,py=0,pz=0;for(let k=0;k<13;k++){const nx=-.5+(k+1)/13,ny=(Math.random()-.5)*.17,nz=(Math.random()-.5)*.17;a.setXYZ(j++,px,py,pz);a.setXYZ(j++,nx,ny,nz);px=nx;py=ny;pz=nz}}a.needsUpdate=true;arc.visible=Math.random()<.85}}}
  if(/angler/.test(n)){add(new THREE.ConeGeometry(.01,.3,4),mt('#222a3a'),D[0]*.4,D[1]+.12,0).rotation.z=-.5;add(sp(8,6),new THREE.MeshBasicMaterial({color:'#6ff0ff'}),D[0]*.4+.12,D[1]+.27,0,.05,.05,.05)}
+ {const BD={fish:{A:.085,k:2.3,e0:.1,ep:1.6},torp:{A:.06,k:2,e0:.1,ep:1.6},eel:{A:.12,k:5.2,e0:.35,ep:1.2},shark:{A:.075,k:2.1,e0:.1,ep:1.6},cat:{A:.095,k:2.4,e0:.1,ep:1.6},whale:{A:.05,k:1.8,e0:.1,ep:1.6,ax:'y'},behemoth:{A:.035,k:1.8,e0:.1,ep:1.6}}[kind];
+  if(BD&&!sk&&!NS&&kind!=='octo'&&kind!=='ray'&&kind!=='jelly'){const tl=new Set(u.tails.map(o=>o.p)),ps=bm.geometry.attributes.position;
+   u.bend={...BD,ax:BD.ax||'z',tg:1.5,bm,base:Float32Array.from(ps.array),parts:g.children.filter(c=>c!==bm).map(c=>({o:c,x:c.position.x,y:c.position.y,z:c.position.z,r:c.rotation.y,rz:c.rotation.z,tail:tl.has(c)}))};
+   if(!dark){const ca=new Float32Array(ps.count*3);for(let i=0;i<ps.count;i++){const y=ps.getY(i),q=Math.min(1,Math.max(0,(-y+.9)/1.8)),f=.72+.28*q*q*(3-2*q);ca[i*3]=ca[i*3+1]=ca[i*3+2]=f}
+    bm.geometry.setAttribute('color',new THREE.BufferAttribute(ca,3));bm.material.vertexColors=true;bm.material.color.multiplyScalar(1.12)}}}
  return root}
 const sm_=(a,b,x)=>{const u=Math.max(0,Math.min(1,(x-a)/(b-a)));return u*u*(3-2*u)};
-export function animateFish(g,t,sp=.5){const u=g.userData,ph=u.ph||0,tt=t*(3.4+sp*7.5)+ph,k=u.kind,dt=Math.min(.1,Math.max(0,t-(u.lt===undefined?t:u.lt)));u.lt=t;
- if(u.body){const w=k==='eel'?2.1:k==='ray'?.12:k==='whale'?.5:k==='octo'?.15:1,am=(.07+sp*.15)*w;
-  u.body.rotation.y=Math.sin(tt)*am;u.body.rotation.z=Math.sin(tt*.5+1.3)*.03*(.4+sp)*w;u.body.position.y=Math.sin(tt*.5)*.012*w}
- u.tails.forEach(o=>{const a=Math.sin(tt-1.15-(o.ph||0)*.38)*(.22+sp*.34);o.p.rotation[o.ax||'y']=a});
- u.fins.forEach((p,i)=>p.rotation.x=(i?-1:1)*(u.fr+Math.sin(t*(k==='ray'?2.4+sp*2.2:2.6+sp*3)+(k==='ray'?0:i*.9+ph))*u.fa*(1+sp*.5)));if(u.xf)u.xf(tt,t,sp,dt)}
+export function animateFish(g,t,sp0=.5){const u=g.userData,ph=u.ph||0,k=u.kind,dt=Math.min(.1,Math.max(0,t-(u.lt===undefined?t:u.lt)));u.lt=t;
+ // kecepatan dihaluskan & fase DIAKUMULASI (dulu t*kecepatan -> fase melompat tiap kecepatan berubah = patah-patah/glitch)
+ u.sp=u.sp===undefined?sp0:u.sp+(sp0-u.sp)*Math.min(1,dt*5);const sp=u.sp;
+ u.pa=(u.pa||0)+dt*(3.4+sp*7.5);u.pf=(u.pf||0)+dt*(k==='ray'?2.4+sp*2.2:2.6+sp*3);
+ const tt=u.pa+ph,B=u.bend;
+ if(u.body){const w=k==='eel'?2.1:k==='ray'?.12:k==='whale'?.5:k==='octo'?.15:1,am=(.07+sp*.15)*w*(B?.35:1);
+  u.body.rotation.y=Math.sin(tt+(B?1.2:0))*am;u.body.rotation.z=Math.sin(tt*.5+1.3)*.03*(.4+sp)*w;u.body.position.y=Math.sin(tt*.5)*.012*w}
+ u.tails.forEach(o=>{o.p.rotation[o.ax||'y']=B?0:Math.sin(tt-1.15-(o.ph||0)*.38)*(.22+sp*.34)});
+ u.fins.forEach((p,i)=>p.rotation.x=(i?-1:1)*(u.fr+Math.sin(u.pf+(k==='ray'?0:i*.9+ph))*u.fa*(1+sp*.5)));
+ if(B){ // tulang belakang: gelombang merambat dari kepala ke ekor, badan + sirip + ekor mengikuti lengkungannya
+  const D=u.D,D0=D[0],lat=B.ax==='z',A=B.A*(.55+.7*sp)*2*D0,off=x=>{const q=x/D0,s=(q+1)/2;return A*(B.e0+(1-B.e0)*Math.pow(Math.max(0,1-s),B.ep))*Math.sin(B.k*q+tt)};
+  const pos=B.bm.geometry.attributes.position,b=B.base,sc=lat?D[2]:D[1];
+  for(let i=0;i<pos.count;i++){const o=off(b[i*3]*D0)/sc;if(lat)pos.setZ(i,b[i*3+2]+o);else pos.setY(i,b[i*3+1]+o)}pos.needsUpdate=true;
+  for(const q of B.parts){const o=q.o,d=off(q.x),th=Math.atan((off(q.x+.012)-off(q.x-.012))/.024);
+   if(lat){o.position.z=q.z+d;o.rotation.y=q.tail?-th*B.tg:q.r-th}else{o.position.y=q.y+d;o.rotation.z=q.tail?th*B.tg:q.rz+th}}}
+ if(u.xf)u.xf(tt,t,sp,dt)}
 
 export function disposeFish(o){o.traverse(c=>{if(c.geometry)c.geometry.dispose();const m=c.material;if(m)(Array.isArray(m)?m:[m]).forEach(x=>x.dispose())})}
 let tr_,ts,tc;const cache={};
