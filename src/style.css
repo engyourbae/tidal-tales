@@ -147,3 +147,28 @@ button:disabled{filter:grayscale(.6);opacity:.55}
 .row:has(>span:last-child>button:nth-child(2))>span:last-child{flex:1 1 100%;flex-wrap:nowrap;justify-content:stretch}
 .row:has(>span:last-child>button:nth-child(2))>span:last-child>button{flex:1 1 0;min-width:0;padding-left:6px;padding-right:6px}
 .row:has(>span:last-child>button:nth-child(2))>span:last-child>button.star{flex:0 0 46px}
+
+/* ===== indikator geser ringkas + HUD rapi + animasi lebih halus ===== */
+/* Indikator GESER: dulu kotak besar di tengah layar yang menutupi karakter. Sekarang pil kecil di bawah bilah atas. */
+#swipe{top:calc(66px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:10px;row-gap:5px;width:max-content;min-width:0;max-width:min(84vw,300px);padding:7px 14px 8px;border-width:2px;border-radius:10px;opacity:.94;will-change:transform}
+#swt{font-size:14px;letter-spacing:1px;line-height:1;white-space:nowrap}
+#swipe .bar{grid-column:1/-1;width:100%;height:7px;margin:0;border-radius:4px}
+#swipe[data-d=L] #swa{border-width:9px 15px 9px 0}
+#swipe[data-d=R] #swa{border-width:9px 0 9px 15px}
+#swipe[data-d=U] #swa{border-width:0 9px 15px 9px}
+#swipe[data-d=D] #swa{border-width:15px 9px 0 9px}
+/* Bilah atas: semua kotak sama tinggi, satu baris rapi, tidak melebar ke bawah dan menabrak tombol di bawahnya. */
+#top{top:calc(8px + env(safe-area-inset-top,0px));gap:6px;align-items:stretch;flex-wrap:nowrap}
+#top span{display:flex;align-items:center;min-width:0;height:50px;padding:4px 9px;font-size:11.5px;line-height:1.2;overflow:hidden;overflow-wrap:anywhere}
+#top #loc{flex:1 1 0}
+#top #coins,#top #lvl{flex:0 0 auto}
+#menuBtn{margin-top:0;align-self:center;min-height:42px}
+#dock{top:calc(74px + env(safe-area-inset-top,0px))}
+#hud{bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+#msg{max-width:88vw;pointer-events:none;z-index:5}
+/* Kinerja: tiap elemen HUD dipisah lapisannya dan bilah dibatasi perubahan tata letaknya, supaya update angka tidak ikut menggambar ulang seluruh layar. */
+#top,#dock,#msg,#banner,#flexui,#joy,#swipe,#hud{backface-visibility:hidden}
+.bar{contain:layout paint}
+html,body,#app{overscroll-behavior:none}
+button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#modal.sheet:has(.mlogo) .panel{will-change:transform}
