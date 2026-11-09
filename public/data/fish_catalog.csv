@@ -29,3 +29,26 @@ fish_27,Sidat Rawa,Rare,Mangrove Marsh,sedang,Meliuk kuat,"Kulit licin, pola zai
 fish_28,Kakap Merah,Uncommon,Coral Bay,sedang,Tarikan sedang,Merah-oranye dengan sisik tegas,3.2,125
 fish_29,Marlin Biru,Legendary,Coral Bay,raksasa,Lompatan tinggi,"Paruh panjang, sirip punggung tinggi",90.0,3200
 fish_30,Paus Bintang,Mythic,Abyssal Trench (event),raksasa,Event boss,Siluet paus dengan pola galaksi,1200.0,25000
+fish_31,Hiu Putih Raksasa,Legendary,Coral Bay,raksasa,Predator ekstrem,"Abu perak, rahang lebar",450,5200
+fish_32,Paus Purba Safir,Mythic,Abyssal Trench,raksasa,Boss fight,Siluet paus safir dengan garis bercahaya,2400,38000
+fish_33,Marlin Hitam Raksasa,Legendary,Coral Bay,raksasa,Lompatan tinggi,"Paruh panjang, tubuh navy gelap",380,5800
+fish_34,Manta Raksasa,Legendary,Coral Bay,raksasa,Meluncur,Sayap lebar putih perak,260,4200
+fish_35,Patin Raksasa,Epic,Misty River,besar,Tarikan ekstrem,Tubuh licin abu besar,60,900
+fish_36,Toman Kaisar,Legendary,Mangrove Marsh,besar,Sangat agresif,"Loreng emas, rahang kuat",85,2800
+fish_37,Lele Purba,Epic,Mangrove Marsh,besar,Dasar air,"Kumis panjang, cokelat gelap",40,700
+fish_38,Gurita Raksasa,Legendary,Abyssal Trench,raksasa,Menghindar,"Tubuh merah gelap, tentakel panjang",180,4800
+fish_39,Leviathan Samudra,Mythic,Abyssal Trench,raksasa,Boss fight,Makhluk laut purba berwarna navy,600,30000
+fish_40,Tuna Raksasa Samudra,Epic,Coral Bay,raksasa,Tarikan ekstrem,"Badan kuat, biru metalik",120,2400
+fish_41,Hiu Martil Bayangan,Legendary,Abyssal Trench,raksasa,Predator,Abu gelap dengan mata bercahaya,320,5600
+fish_42,Koi Emas Raksasa,Epic,Willow Lake,besar,Anggun,Emas dengan pola awan,22,1300
+fish_43,Ikan Buntal Duri,Uncommon,Coral Bay; Mangrove Marsh,kecil,Mengembang,Cokelat kekuningan dengan duri,1.5,110
+fish_44,Kuda Laut Pelangi,Rare,Coral Bay; Mangrove Marsh,kecil,Melayang,Oranye dengan warna pelangi,0.4,290
+fish_45,Ubur-ubur Lentera,Rare,Abyssal Trench; Coral Bay (malam),sedang,Melayang,Cyan transparan bercahaya,3.0,340
+fish_46,Ikan Mola Raksasa,Epic,Coral Bay,besar,Santai,Abu perak bulat pipih,220,1250
+fish_47,Penyu Giok,Epic,Coral Bay; Mangrove Marsh,besar,Anggun,Hijau giok dengan cangkang bersegi,90,1100
+fish_48,Piranha Merah,Uncommon,Misty River; Mangrove Marsh,kecil,Agresif,Merah dengan perut oranye,1.2,90
+fish_49,Tidal Behemoth,Secret,Abyssal Trench,raksasa,Boss mutlak,"Ungu kristal, mata toska bercahaya, rahang merah muda",1500,90000
+fish_50,Kameleon Prisma,Secret,Coral Bay,sedang,Berubah wujud,Warna berganti seperti pelangi,45,60000
+fish_51,Koi Hantu Surgawi,Secret,Misty River (malam),besar,Berubah wujud,Putih toska tembus pandang,70,65000
+fish_52,Sidat Petir Surgawi,Secret,Mangrove Marsh (senja),sedang,Berubah wujud,Emas kuning petir bercahaya,30,58000
+fish_53,Nebula Metamorfosa,Secret,Willow Lake (malam),sedang,Berubah wujud,Galaksi ungu bertabur bintang,55,70000
