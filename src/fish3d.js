@@ -99,15 +99,16 @@ export function animateFish(g,t,sp=.5){const u=g.userData,ph=u.ph||0,tt=t*(3.4+s
  u.tails.forEach(o=>{const a=Math.sin(tt-1.15-(o.ph||0)*.38)*(.22+sp*.34);o.p.rotation[o.ax||'y']=a});
  u.fins.forEach((p,i)=>p.rotation.x=(i?-1:1)*(u.fr+Math.sin(t*(k==='ray'?2.4+sp*2.2:2.6+sp*3)+(k==='ray'?0:i*.9+ph))*u.fa*(1+sp*.5)));if(u.xf)u.xf(tt,t,sp,dt)}
 
+export function disposeFish(o){o.traverse(c=>{if(c.geometry)c.geometry.dispose();const m=c.material;if(m)(Array.isArray(m)?m:[m]).forEach(x=>x.dispose())})}
 let tr_,ts,tc;const cache={};
 export function thumb(f,dark=false,mut=null){
  const k=f.id+dark+(mut?mut.k:'');if(cache[k])return cache[k];
  if(!tr_){tr_=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});tr_.setSize(240,120);ts=new THREE.Scene();ts.add(new THREE.HemisphereLight('#ffffff','#667788',1.6));const d=new THREE.DirectionalLight('#ffffff',2);d.position.set(1,2,3);ts.add(d);tc=new THREE.PerspectiveCamera(30,2,.1,20);tc.position.set(.1,.25,2.5);tc.lookAt(0,0,0)}
- const m=makeFish(f,dark,mut);m.rotation.y=-.45;ts.add(m);tr_.render(ts,tc);const url=tr_.domElement.toDataURL();ts.remove(m);return cache[k]=url}
+ const m=makeFish(f,dark,mut);m.rotation.y=-.45;ts.add(m);tr_.render(ts,tc);const url=tr_.domElement.toDataURL();ts.remove(m);disposeFish(m);return cache[k]=url}
 
 let vr,vs,vc,vm,vraf=0;
 export function startViewer(f){stopViewer();
  if(!vr){vr=new THREE.WebGLRenderer({antialias:true,alpha:true});vr.setPixelRatio(Math.min(devicePixelRatio||1,2));vr.setSize(300,150);vs=new THREE.Scene();vs.add(new THREE.HemisphereLight('#ffffff','#667788',1.6));const d=new THREE.DirectionalLight('#ffffff',2);d.position.set(1,2,3);vs.add(d);vc=new THREE.PerspectiveCamera(30,2,.1,20);vc.position.set(0,.2,2.6);vc.lookAt(0,0,0);vr.domElement.style.cssText='width:100%;height:auto;display:block'}
  vm=makeFish(f,false,f.mut);vs.add(vm);const t0=performance.now();
  const tick=()=>{const t=(performance.now()-t0)/1000;vm.rotation.y=Math.sin(t*.8)*.7-.3;vm.position.y=Math.sin(t*1.6)*.04;vm.rotation.z=Math.sin(t*1.1)*.05;animateFish(vm,t,.45);vm.userData.mats.forEach(m=>{m.emissiveIntensity=m.userData.e0*(1+.5*Math.sin(t*4))});vr.render(vs,vc);vraf=requestAnimationFrame(tick)};tick();return vr.domElement}
-export function stopViewer(){cancelAnimationFrame(vraf);if(vm&&vs){vs.remove(vm);vm=null}}
+export function stopViewer(){cancelAnimationFrame(vraf);if(vm&&vs){vs.remove(vm);disposeFish(vm);vm=null}}
