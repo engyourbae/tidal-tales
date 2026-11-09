@@ -96,8 +96,8 @@ button:disabled{filter:grayscale(.6);opacity:.55}
 .b-fish .fw{transform-origin:20% 50%;animation:bwig .5s ease-in-out infinite alternate}
 @keyframes bwig{from{transform:rotate(-7deg) skewX(-4deg)}to{transform:rotate(7deg) skewX(4deg)}}
 .f1{bottom:22%;left:0;animation:bswim 11s linear infinite}.f2{bottom:30%;left:0;width:56px;opacity:.6;animation:bswimr 15s linear infinite;animation-delay:-5s}.f3{bottom:15%;left:0;width:120px;opacity:.5;animation:bswim 19s linear infinite;animation-delay:-9s}.f3 path{fill:#b695ff}
-@keyframes bswim{from{transform:translateX(-30vw)}to{transform:translateX(130vw)}}
-@keyframes bswimr{from{transform:translateX(130vw) scaleX(-1)}to{transform:translateX(-30vw) scaleX(-1)}}
+@keyframes bswim{from{transform:translateX(-30vw) scaleX(-1)}to{transform:translateX(130vw) scaleX(-1)}}
+@keyframes bswimr{from{transform:translateX(130vw)}to{transform:translateX(-30vw)}}
 .b-wave{position:absolute;left:0;bottom:0;width:200%;height:20vh;z-index:2;animation:bwave 9s linear infinite}
 .b-wave.w1{fill:rgba(60,160,235,.55)}.b-wave.w2{fill:rgba(30,110,200,.7);height:15vh;animation-duration:6s;animation-direction:reverse}.b-wave.w3{fill:#0b4fa8;height:9vh;animation-duration:4.5s}
 @keyframes bwave{to{transform:translateX(-50%)}}
