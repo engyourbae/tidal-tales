@@ -120,3 +120,7 @@ button:disabled{filter:grayscale(.6);opacity:.55}
 #omenfx::after{content:"";position:absolute;inset:0;background:#cfd8ff;opacity:calc(var(--fl,0)*.32)}
 @keyframes ominous{0%,100%{filter:brightness(1)}50%{filter:brightness(.78)}}
 .mlogo{float:right;width:84px;height:84px;object-fit:contain;margin:-6px 0 4px 8px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.4))}
+
+.sec{width:100%;text-align:left;margin:8px 0 3px!important;color:#fff;font-weight:800;letter-spacing:.5px;text-shadow:0 1px 0 rgba(0,0,0,.4)}
+.star{min-width:38px;font-size:19px;line-height:1;padding-left:8px;padding-right:8px}.star.on{background:#f2b705!important;color:#3a2500!important}
+.warn2{background:#d1493f!important;color:#fff!important}.lock{opacity:.55}
