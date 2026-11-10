@@ -117,7 +117,7 @@ function update(dt){
  if(s==='charge'){G.pw+=G.pd*110*dt;if(G.pw>=100||G.pw<=0){G.pd*=-1;G.pw=cl(G.pw,0,100)}}
  else if(s==='cast'){G.t+=dt;if(G.t>=.7){G.st='wait';G.t=0;G.bt=rnd(2,6)*(G.bait?.7:1)*({rain:.85,storm:.7,meteor:.8}[G.wx]||1)*(world.spot==='kiri'?.8:1);world.splash(G.cd,16);world.ring(G.cd,'#dfeaf2',2.2);sfx('splash')}}
  else if(s==='wait'){G.t+=dt;if(Math.floor(G.t*.9)!==Math.floor((G.t-dt)*.9))world.ring(G.cd,'#dfeaf2',.9);
-  if(G.t>=G.bt){G.st='bite';G.t=0;G.bw=1.1+R().control*.012;G.f=pick();for(let i=0;i<3;i++)setTimeout(()=>world.ring(G.cd,'#ffffff',1.6),i*180);sfx('bite');say('IKAN MENGGIGIT! TEKAN STRIKE',G.bw)}}
+  if(G.t>=G.bt){G.st='bite';G.t=0;G.bw=1.1+R().control*.012;G.f=pick();for(let i=0;i<3;i++)setTimeout(()=>world.ring(G.cd,'#ffffff',1.6),i*180);sfx('catch',Math.max(0,RN.indexOf(G.f.rarity)));say('IKAN MENGGIGIT! TEKAN STRIKE',G.bw)}}
  else if(s==='bite'){G.t+=dt;if(G.t>G.bw){say('Terlambat. Ikan pergi.');sfx('miss');reset()}}
  else if(s==='fight')fight(dt);
  else if(s==='catch'){G.ct+=dt;if(G.ct>=G.cdur){G.st='result';G.after()}}
@@ -133,7 +133,7 @@ function finish(){
  
  const bn=[];{if(f.sz)bn.push(`<div class="bn" style="background:#b8321f">${f.sz}! ${f.weight} KG</div>`);if(ix>=3)bn.push(`<div class="bn" style="background:${RC[f.rarity]}">${f.rarity.toUpperCase()}</div>`);if(mu){bn.push(`<div class="bn m" style="background:${mu.c}">MUTASI ${mu.n.toUpperCase()}</div>`);bn.push(`<div class="bn m" style="background:#3a1020;animation-delay:.7s">SUASANA MENCEKAM...</div>`)}}
  const B=$('#banner');B.innerHTML=bn.join('');B.hidden=!bn.length;
- {sfx('catch',ix);if(mu)setTimeout(()=>sfx('mut'),250);if(up)setTimeout(()=>sfx('level'),900)}save();
+ {if(ix>=6)sfx('secretok');if(mu)setTimeout(()=>sfx('mut'),250);if(up)setTimeout(()=>sfx('level'),900)}save();
  const co={id:f.id,w:f.weight,len:f.len,val,r:f.rarity,sz:f.sz||'',mut:mu?mu.n:'',mk:mu?mu.k:''},done=()=>{stopViewer();closeM();reset();$('#cut').classList.remove('on');$('#cine').classList.remove('on');B.hidden=true};
  G.after=()=>{const b=h('div');b.append(startViewer(f),h('div','big',f.name),h('div','',`<span class="tag" style="background:${RC[f.rarity]}">${f.rarity.toUpperCase()}</span> ${f.sz?`<span class="tag" style="background:#b8321f">${f.sz}</span> `:''}${mu?`<span class="tag" style="background:${mu.c}">MUTASI ${mu.n.toUpperCase()} x${mu.m}</span> `:''}${isNew?'<b>SPESIES BARU</b> ':''}${rec&&!isNew?'<b>REKOR BERAT</b>':''}`),
   h('div','row',`<span>Panjang ${f.len} cm</span><span>Berat ${f.weight} kg</span><span>Nilai ${val} koin</span>`),h('div','',`Bonus energi tap: +${bonus} XP (puncak ${eM}%)`),up?h('div','',`<b>LEVEL NAIK: ${S.lv}</b>`):h('span'));
