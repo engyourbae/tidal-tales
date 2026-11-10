@@ -23,13 +23,20 @@ export function makeFish(f,dark=false,mut=null){
  const add=(geo,m,x,y,z,sx=1,sy=1,sz=1,p=g)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);p.add(o);return o};
  const u=root.userData={tails:[],fins:[],fr:.7,fa:.25,mats:[],kind,dy:D[1],ph:Math.random()*6},sy=kind==='fish'||kind==='cat'?D[1]/.2:Math.max(.35,D[1]/.13*.9),sc=pts=>pts.map(p=>[p[0],p[1]*sy]);
  const pv=new THREE.Group();pv.position.x=D[0]*.42;root.add(pv);g.position.x=-D[0]*.42;pv.add(g);u.body=pv;
+ u.chains=[];const UPV=new THREE.Vector3(0,1,0);
+ // rantai segmen lentur (tentakel / kumis): tiap ruas meruncing & berputar sedikit demi sedikit -> melengkung dan bergelombang seperti tulang rawan
+ const chain=(par,x,y,z,dir,len,r0,r1,n,mat,o={})=>{const base=new THREE.Group();base.position.set(x,y,z);base.quaternion.setFromUnitVectors(UPV,new THREE.Vector3(dir[0],dir[1],dir[2]).normalize());par.add(base);
+  const L=len/n,segs=[];let cur=base;
+  for(let i=0;i<n;i++){const ra=r0+(r1-r0)*(i/n),rb=r0+(r1-r0)*((i+1)/n),gp=new THREE.Group();if(i>0)gp.position.y=L;gp.rotation.z=o.cz||0;cur.add(gp);
+   gp.add(new THREE.Mesh(new THREE.CylinderGeometry(rb,ra,L*1.12,6,1).translate(0,L*.5,0),mat));segs.push(gp);cur=gp}
+  u.chains.push({segs,A:o.A===undefined?.35:o.A,lag:o.lag||.6,w:o.w||1,ph:o.ph||0,cz:o.cz||0,cx:o.cx||0});return base};
  const NS=['puffer','horse','jelly','mola','turtle'].includes(kind),bm=add(kind==='jelly'?new THREE.SphereGeometry(1,12,8,0,6.283,0,1.7):kind==='octo'||kind==='ray'||NS?sp(...seg):bodyGeo(seg),mt(col,.3),0,0,0,...D);u.bm=bm;u.D=D;
  const T=(pts,ax='y',rx=false)=>{const p=new THREE.Group();p.position.set(-D[0]*.9,0,0);g.add(p);add(shp(pts,rx),mt(sh%3?fin:acc,.3),0,0,0,1,1,1,p);u.tails.push({p,ph:0,ax})};
  const dors=(pts,x=0)=>add(shp(pts),mt(fin,.3),x,D[1]*.8,0);
  const pect=(pts,pf=1)=>{for(const s of[1,-1]){const q=new THREE.Group();q.position.set(D[0]*.28,-D[1]*.35,s*D[2]*.8);g.add(q);add(shp(pts,true),mt(fin,.3),0,0,0,pf,1,s*pf,q);u.fins.push(q)}};
  if(!dark&&kind!=='octo'&&kind!=='ray'&&!NS&&kind!=='behemoth'){
   add(sp(10,6),mt('#e6ebf0'),.04,-D[1]*.55,0,D[0]*.7,D[1]*.5,D[2]*.85);
-  add(new THREE.BoxGeometry(.015,.012,D[2]*1.1),mt('#1b2433'),D[0]*.93,-D[1]*.25,0);
+  add(sp(6,5),mt('#1b2433'),D[0]*.972,-D[1]*.16,0,.02,.016,Math.min(.045,D[2]*.42));
   const band=(xs,c)=>xs.forEach(x=>{const k=prof(x/D[0]);add(new THREE.TorusGeometry(1,.07,5,16).rotateY(Math.PI/2),mt(c),x,0,0,1,D[1]*k*1.02,D[2]*k*1.02)});
   if(/pita/.test(br))band([-.18,.05,.27],'#eef2f7');if(/loreng/.test(br))band([-.25,-.08,.1,.28],'#2a2018');
   if(/pola|awan|bekas/.test(br))for(let k=0;k<4;k++){const x=-.28+k*.17;add(sp(6,5),mt(acc,.2),x,D[1]*prof(x/D[0])*.8,(k%2?1:-1)*D[2]*.35,.09,.03,.06)}}
@@ -50,15 +57,18 @@ export function makeFish(f,dark=false,mut=null){
   const fg=new THREE.Group();fg.position.set(-.1,.0,0);g.add(fg);add(shp([[0,.1],[-.13,.0],[0,-.1]]),mt(cc('#ffd8f0'),.3),0,0,0,1,1,1,fg);u.tails.push({p:fg,ph:0,ax:'y'});for(let k=0;k<4;k++)add(new THREE.ConeGeometry(.02,.07,4),mt(hc(k+3)),-.05,.2-k*.1,0).rotation.z=Math.PI/2+.2;
   u.xf=(tt)=>{u.bm.rotation.z=Math.sin(tt*.35)*.12}}
  else if(kind==='jelly'){const bmt=bm.material;bmt.transparent=true;bmt.opacity=.72;bmt.emissive.set(dark?'#000000':col);bmt.emissiveIntensity=dark?0:.4;bmt.userData.e0=bmt.emissiveIntensity;
-  for(let k=0;k<8;k++){const a=k/8*6.283,gp=new THREE.Group();gp.position.set(Math.cos(a)*.13,0,Math.sin(a)*.13);g.add(gp);add(new THREE.ConeGeometry(.022,.55,5).rotateX(Math.PI).translate(0,-.28,0),gm(cc('#e8b8ff'),'#c58cff',.6),0,0,0,1,1,1,gp);u.tails.push({p:gp,ph:k*.7,ax:'z'})}
-  for(let k=0;k<4;k++){const a=k/4*6.283+.4,gp=new THREE.Group();gp.position.set(Math.cos(a)*.06,0,Math.sin(a)*.06);g.add(gp);add(new THREE.ConeGeometry(.012,.85,4).rotateX(Math.PI).translate(0,-.43,0),gm(cc('#ffffff'),'#bfe8ff',.5),0,0,0,1,1,1,gp);u.tails.push({p:gp,ph:k,ax:'x'})}
+  {const om=gm(cc('#e8b8ff'),'#c58cff',.6),am_=gm(cc('#ffffff'),'#bfe8ff',.5);
+   for(let k=0;k<10;k++){const a=k/10*6.283,ca=Math.cos(a),sa=Math.sin(a);chain(g,ca*.15,-.02,sa*.15,[ca*.1,-1,sa*.1],.66,.017,.003,10,om,{A:.5,lag:.5,w:.9,ph:k*.7,cz:0,cx:0})}
+   for(let k=0;k<4;k++){const a=k/4*6.283+.4,ca=Math.cos(a),sa=Math.sin(a);chain(g,ca*.05,-.02,sa*.05,[ca*.05,-1,sa*.05],.42,.036,.008,7,am_,{A:.42,lag:.62,w:.75,ph:k*1.3,cz:.06,cx:0})}}
   u.xf=(tt)=>{const q=Math.sin(tt*.9);u.bm.scale.set(D[0]*(1+.1*q),D[1]*(1-.16*q),D[2]*(1+.1*q))}}
  else if(kind==='mola'){bm.material.color.set(cc(col));add(shp([[-.05,0],[-.3,.5],[-.36,.22],[-.2,0]]),mt(fin,.3),0,D[1]*.7,0);add(shp([[-.05,0],[-.3,-.5],[-.36,-.22],[-.2,0]]),mt(fin,.3),0,-D[1]*.7,0);T([[0,0],[-.06,.22],[-.1,0],[-.06,-.22]]);pect([[0,0],[-.12,0],[-.08,.1]])}
  else if(kind==='turtle'){const SH=cc('#3f8f5a'),SK=cc('#b8cf8a');bm.material.color.set(SH);add(sp(8,6),mt(SK),D[0]*1.02,0,0,.1,.08,.08);add(new THREE.ConeGeometry(.025,.08,4).rotateZ(Math.PI/2),mt(SK),D[0]*1.2,-.01,0);for(const z of[1,-1])add(sp(6,5),gm(cc('#101a2b'),'#000',0),D[0]*1.12,.03,z*.06,.016,.016,.016);
   for(let k=0;k<7;k++){const a=k?(k-1)/6*6.283:0,r=k?.17:0;add(sp(6,5),mt(cc('#a0d6a8'),.2),Math.cos(a)*r*1.1,D[1]*.9,Math.sin(a)*r*.95,.08,.025,.08)}
   for(const s_ of[1,-1]){const q=new THREE.Group();q.position.set(D[0]*.4,-.02,s_*D[2]*.8);g.add(q);add(sp(8,5),mt(SK),0,0,s_*.15,.07,.015,.17,q);u.fins.push(q);const r=new THREE.Group();r.position.set(-D[0]*.55,-.02,s_*D[2]*.55);g.add(r);add(sp(8,5),mt(SK),0,0,s_*.06,.05,.015,.07,r)}
   add(new THREE.ConeGeometry(.02,.1,4).rotateZ(Math.PI/2),mt(SK),-D[0]*1.05,-.02,0).rotation.z=Math.PI/2*3}
- else if(kind==='octo'){for(let k=0;k<6;k++){const p=new THREE.Group();p.position.set(-D[0]*.5,-D[1]*.4,(k-2.5)*.07);g.add(p);add(new THREE.ConeGeometry(.04,.5,5).rotateZ(Math.PI/2),mt(col,.2),-.25,0,0,1,1,1,p);u.tails.push({p,ph:k,ax:'y'})}}
+ else if(kind==='octo'){const tm=mt(col,.2),tp=mt(cc('#f3d6c8'),.1);
+  for(let k=0;k<8;k++){const a=k/8*6.283+.2,ca=Math.cos(a),sa=Math.sin(a);
+   chain(g,ca*.1,-D[1]*.62,sa*.1,[ca*.95-.3,-1,sa*.95],.62,.052,.006,9,tm,{A:.34+(k%3)*.05,lag:.55,w:.85+(k%2)*.15,ph:k*.8,cz:(k%2?1:-1)*.11,cx:.04})}}
  else if(kind==='ray'){add(new THREE.ConeGeometry(.03,.7,4).rotateZ(Math.PI/2),mt(col),-.55,0,0);for(const s of[1,-1]){const p=new THREE.Group();p.position.set(0,0,s*.12);g.add(p);add(sp(),mt(col,.3),0,0,s*.2,.3,.025,.28,p);add(sp(6,5),mt(acc,.9),0,0,s*.46,.04,.04,.04,p);u.fins.push(p)}u.fr=0;u.fa=.5}
  else if(kind==='eel'){T([[0,0],[-.22,.06],[-.34,0],[-.22,-.06]]);const w=/naga|leviathan/.test(n)?2.2:1;dors([[-.42,0],[-.36,.07*w],[.3,.07*w],[.4,0]])}
  else if(kind==='whale'){T([[0,0],[-.18,.3],[-.3,.22],[-.2,0],[-.3,-.22],[-.18,-.3]],'z',true);dors([[-.1,0],[-.02,.12],[.08,0]]);pect([[0,0],[-.3,0],[-.2,.3]])}
@@ -91,6 +101,12 @@ export function makeFish(f,dark=false,mut=null){
    if(sk==='ghost'){const o=.5+.28*Math.sin(t*1.7);u.mats.forEach(q=>{q.transparent=true;q.opacity=o+.2})}
    if(arc){const a=arc.geometry.attributes.position;let j=0;for(let b=0;b<2;b++){let px=-.5,py=0,pz=0;for(let k=0;k<13;k++){const nx=-.5+(k+1)/13,ny=(Math.random()-.5)*.17,nz=(Math.random()-.5)*.17;a.setXYZ(j++,px,py,pz);a.setXYZ(j++,nx,ny,nz);px=nx;py=ny;pz=nz}}a.needsUpdate=true;arc.visible=Math.random()<.85}}}
  if(/angler/.test(n)){add(new THREE.ConeGeometry(.01,.3,4),mt('#222a3a'),D[0]*.4,D[1]+.12,0).rotation.z=-.5;add(sp(8,6),new THREE.MeshBasicMaterial({color:'#6ff0ff'}),D[0]*.4+.12,D[1]+.27,0,.05,.05,.05)}
+ {const wk=/kumis|sungut/.test(br)?(/panjang/.test(br)?1:.5):/lele|patin/.test(n)?.8:0;
+  if(wk>0){const wm=mt(cc('#3b2d22'),.1),Ls=.14+.26*wk;
+   for(const z of[1,-1]){
+    chain(g,D[0]*.9,-D[1]*.06,z*D[2]*.28,[1,-.22,z*.62],Ls,.011,.0025,6,wm,{A:.42,lag:.55,w:.8,ph:z>0?0:1.3,cz:z*.05});
+    chain(g,D[0]*.88,-D[1]*.2,z*D[2]*.22,[.7,-.75,z*.5],Ls*.7,.009,.0022,5,wm,{A:.4,lag:.6,w:.9,ph:z>0?.7:2,cz:0});
+    if(wk>.7)chain(g,D[0]*.86,-D[1]*.3,z*D[2]*.15,[.45,-1,z*.35],Ls*.55,.008,.002,4,wm,{A:.38,lag:.7,w:1,ph:1.1+z,cz:0})}}}
  {const BD={fish:{A:.085,k:2.3,e0:.1,ep:1.6},torp:{A:.06,k:2,e0:.1,ep:1.6},eel:{A:.12,k:5.2,e0:.35,ep:1.2},shark:{A:.075,k:2.1,e0:.1,ep:1.6},cat:{A:.095,k:2.4,e0:.1,ep:1.6},whale:{A:.05,k:1.8,e0:.1,ep:1.6,ax:'y'},behemoth:{A:.035,k:1.8,e0:.1,ep:1.6}}[kind];
   if(BD&&!sk&&!NS&&kind!=='octo'&&kind!=='ray'&&kind!=='jelly'){const tl=new Set(u.tails.map(o=>o.p)),ps=bm.geometry.attributes.position;
    u.bend={...BD,ax:BD.ax||'z',tg:1.5,bm,base:Float32Array.from(ps.array),parts:g.children.filter(c=>c!==bm).map(c=>({o:c,x:c.position.x,y:c.position.y,z:c.position.z,r:c.rotation.y,rz:c.rotation.z,tail:tl.has(c)}))};
@@ -113,6 +129,7 @@ export function animateFish(g,t,sp0=.5){const u=g.userData,ph=u.ph||0,k=u.kind,d
   for(let i=0;i<pos.count;i++){const o=off(b[i*3]*D0)/sc;if(lat)pos.setZ(i,b[i*3+2]+o);else pos.setY(i,b[i*3+1]+o)}pos.needsUpdate=true;
   for(const q of B.parts){const o=q.o,d=off(q.x),th=Math.atan((off(q.x+.012)-off(q.x-.012))/.024);
    if(lat){o.position.z=q.z+d;o.rotation.y=q.tail?-th*B.tg:q.r-th}else{o.position.y=q.y+d;o.rotation.z=q.tail?th*B.tg:q.rz+th}}}
+ for(const c of u.chains){const am=c.A*(.55+sp*.8),n=c.segs.length;for(let i=0;i<n;i++){const q=c.segs[i],k=.25+.75*(i+1)/n;q.rotation.z=c.cz+am*k*Math.sin(tt*c.w-i*c.lag+c.ph);q.rotation.x=c.cx+am*.7*k*Math.sin(tt*c.w*.87-i*c.lag+c.ph+1.6)}}
  if(u.xf)u.xf(tt,t,sp,dt)}
 
 export function disposeFish(o){o.traverse(c=>{if(c.geometry)c.geometry.dispose();const m=c.material;if(m)(Array.isArray(m)?m:[m]).forEach(x=>x.dispose())})}
