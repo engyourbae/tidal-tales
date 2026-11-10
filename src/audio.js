@@ -1,6 +1,6 @@
 // AUDIO TIDAL TALES: 100% file mp3 dari public/audio (tanpa suara sintetis).
 // Semua efek di-decode di awal lalu dimainkan dengan fade masuk/keluar sangat cepat (anti klik, tanpa jeda).
-let ac,master,sfxG,ambG,musG,reelG,duckG,started=false,scene='game',mood='clear',tod='siang',depth=0,curKey=null,on={sound:true,music:true};
+let ac,master,sfxG,ambG,musG,reelG,duckG,priG,started=false,scene='game',mood='clear',tod='siang',depth=0,curKey=null,on={sound:true,music:true};
 const BASE=((import.meta.env&&import.meta.env.BASE_URL)||'/')+'audio/',EXT='.mp3';
 const VOL={music:.6,amb:.5,sfx:1,reel:.5};
 const FI=.012,FO=.06;            // fade masuk / keluar efek (detik)
@@ -9,8 +9,10 @@ const XF=.18;                    // crossfade musik & ambience (detik): cepat, t
 const SFX={cast:'cast',splash:'splash',hook:null,ok:'ok',fail:'fail',miss:'miss',escape:'escape',level:'level-up',thunder:'thunder',meteor:'meteor-jatuh',mut:null};
 const CATCH=['catch-cammon-rare','catch-cammon-rare','catch-cammon-rare','catch-epic','catch-legend','catch-mytic','catch-secret'];
 const SECRET_OK='secret-berhasil-dapat';
-const SG={'catch-cammon-rare':2.2,'catch-epic':2.2,'catch-legend':2.4,'catch-mytic':2.4,'catch-secret':2.8,[SECRET_OK]:2.8,thunder:.9,'meteor-jatuh':.9};
-const DUCK={'catch-cammon-rare':.45,'catch-epic':.4,'catch-legend':.3,'catch-mytic':.3,'catch-secret':.2,[SECRET_OK]:.2}; // musik & ambience mengecil sebentar saat suara penting bunyi
+// suara penting (catch & secret): dinormalkan ke puncak penuh lalu dikuatkan, lewat bus sendiri + limiter => lantang
+const PRI={'catch-cammon-rare':2.4,'catch-epic':2.4,'catch-legend':2,'catch-mytic':2,'catch-secret':2,[SECRET_OK]:2.4},PK={};
+const SG={thunder:.3,'meteor-jatuh':.6};
+const DUCK={'catch-cammon-rare':.3,'catch-epic':.25,'catch-legend':.2,'catch-mytic':.18,'catch-secret':.12,[SECRET_OK]:.12}; // musik & ambience mengecil sebentar saat suara penting bunyi
 const MUSIC=['main','rain-music','storm','meteor','omen','fight','ride','aquarium'];
 const AMB=['waves','rain','wind','night','under'];
 const bad={},SB={},AB={},TR={};let live=[];
@@ -18,21 +20,22 @@ function ctx(){if(ac)return ac;const C=window.AudioContext||window.webkitAudioCo
  const cp=ac.createDynamicsCompressor();cp.threshold.value=-18;cp.knee.value=18;cp.ratio.value=4;cp.attack.value=.003;cp.release.value=.15;
  master=ac.createGain();master.gain.value=.95;master.connect(cp);cp.connect(ac.destination);
  sfxG=ac.createGain();sfxG.connect(master);ambG=ac.createGain();ambG.connect(duckG);duckG=ac.createGain();duckG.connect(master);musG=ac.createGain();musG.gain.value=0;musG.connect(duckG);
- reelG=ac.createGain();reelG.gain.value=0;reelG.connect(master);return ac}
+ reelG=ac.createGain();reelG.gain.value=0;reelG.connect(master);
+ const lim=ac.createDynamicsCompressor();lim.threshold.value=-4;lim.knee.value=0;lim.ratio.value=20;lim.attack.value=.001;lim.release.value=.12;priG=ac.createGain();priG.connect(lim);lim.connect(ac.destination);return ac}
 function fetchBuf(n){return fetch(BASE+n+EXT).then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(b=>new Promise((ok,no)=>{const p=ac.decodeAudioData(b,ok,no);if(p&&p.catch)p.catch(no)}))}
 function loadAssets(){
  const sfxNames=[...new Set([...Object.values(SFX).filter(Boolean),...CATCH,SECRET_OK])];
- sfxNames.forEach(n=>fetchBuf(n).then(b=>{SB[n]=b}).catch(()=>{}));
+ sfxNames.forEach(n=>fetchBuf(n).then(b=>{SB[n]=b;if(PRI[n]){let m=0;for(let c=0;c<b.numberOfChannels;c++){const d=b.getChannelData(c);for(let i=0;i<d.length;i++){const x=Math.abs(d[i]);if(x>m)m=x}}PK[n]=Math.min(20,.98/Math.max(m,.02))}}).catch(()=>{}));
  // ambience + suara reel (loop) via buffer agar mulus
  const loop=(n,dest,store)=>fetchBuf(n).then(b=>{const s=ac.createBufferSource(),g=ac.createGain();s.buffer=b;s.loop=true;g.gain.value=0;s.connect(g);g.connect(dest);s.start();store[n]=g;applyVol()}).catch(()=>{});
  setTimeout(()=>{AMB.forEach(n=>loop(n,ambG,AB));loop('fishing-reel',reelG,AB)},500)}
 // efek: masuk cepat, keluar cepat. Efek lama yang masih bunyi lain ikut di-fade supaya tidak numpuk/ada jeda
 function play(n,vol=1,delay=0,fadeOthers=false){const b=SB[n];if(!b)return false;const T=ac.currentTime+delay,s=ac.createBufferSource(),g=ac.createGain(),d=b.duration;
- s.buffer=b;const v=vol*(SG[n]??1)*VOL.sfx;g.gain.setValueAtTime(0,T);g.gain.linearRampToValueAtTime(v,T+FI);
+ s.buffer=b;const pri=PRI[n]!==undefined,v=pri?vol*PK[n]*PRI[n]:vol*(SG[n]??1)*VOL.sfx;g.gain.setValueAtTime(0,T);g.gain.linearRampToValueAtTime(v,T+FI);
  const fo=Math.min(FO,d*.3);g.gain.setValueAtTime(v,Math.max(T+FI,T+d-fo));g.gain.linearRampToValueAtTime(0,T+d);
  if(fadeOthers)live.forEach(o=>{try{o.g.gain.cancelScheduledValues(T);o.g.gain.setValueAtTime(o.g.gain.value,T);o.g.gain.linearRampToValueAtTime(0,T+FO);o.s.stop(T+FO+.01)}catch{}});
  if(DUCK[n]!==undefined){const dg=duckG.gain;dg.cancelScheduledValues(T);dg.setTargetAtTime(DUCK[n],T,.03);dg.setTargetAtTime(1,T+d*.85,.25)}
- s.connect(g);g.connect(sfxG);s.start(T);s.stop(T+d+.02);const o={s,g};live.push(o);s.onended=()=>{live=live.filter(x=>x!==o)};return true}
+ s.connect(g);g.connect(pri?priG:sfxG);s.start(T);s.stop(T+d+.02);const o={s,g};live.push(o);s.onended=()=>{live=live.filter(x=>x!==o)};return true}
 export function sfx(n,a=0){if(!on.sound||!ctx())return;
  if(n==='catch'){const k=CATCH[Math.max(0,Math.min(6,a))];play(k,1,0,true);return}
  if(n==='secretok'){play(SECRET_OK,1,0,true);return}
