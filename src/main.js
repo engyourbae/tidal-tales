@@ -23,8 +23,6 @@ const it=(k,id)=>GEAR[k].find(x=>x.id===id),R=()=>it('rods',S.rod),RL=()=>it('re
 const cl=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a),hash=s=>[...s].reduce((a,c)=>a*31+c.charCodeAt(0)>>>0,7);
 const h=(t,c='',x='')=>{const e=document.createElement(t);e.className=c;e.innerHTML=x;return e};
 const btn=(t,fn,c='')=>{const b=h('button',c,t);b.onclick=fn;return b};
-let ac;const beep=(f,d=.08,ty='square')=>{if(!S.opt.sound)return;try{ac=ac||new AudioContext();const o=ac.createOscillator(),g=ac.createGain();o.type=ty;o.frequency.value=f;g.gain.value=.04;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch{}};
-
 const BOOT=$('#boot'),bt0=performance.now(),TIPS=['Geser layar sesuai arah panah saat ikan besar menarik. Makin langka ikannya, makin banyak geseran!','Coba mancing di tepi pulau: jalan lewat jembatan kayu atau tekan PINDAH SPOT.','Naik ikan lalu selam sampai 14 meter untuk peti harta dan bintang XP.','Tanda !? di atas kepala karakter menunjukkan tier ikan yang menyambar umpanmu.','Ikan Secret hanya muncul untuk pemancing level 12 ke atas. Waspadai suasana mencekam!'];let bp=0;
 const boot=(p,t)=>{bp=Math.max(bp,p);const f=$('#bfill');if(f)f.style.width=bp+'%';const x=$('#btxt');if(x&&t)x.textContent=t;const pc=$('#bpct');if(pc)pc.textContent=Math.round(bp)+'%'};
 const nextFrame=()=>new Promise(r=>requestAnimationFrame(()=>setTimeout(r,30)));
@@ -90,7 +88,7 @@ function fight(dt){
  if(G.swT<=0&&G.swM.length&&G.prog>=G.swM[0]){G.swCur=G.swM.shift();{const ds=['L','R','U','D'].filter(x=>x!==G.swLast);G.swDir=ds[Math.floor(Math.random()*ds.length)];G.swLast=G.swDir}G.swT=Math.max(1.25,2.1-RN.indexOf(G.f.rarity)*.1)+rnd(0,.4);G.swMax=G.swT;sfx('prompt')}
  G.ten=cl(25+G.pull*.5+(sur?25:0)+G.tapP*18-G.prog*.15,0,100);G.dist=100-G.prog;G.sta=100-G.prog;
  if(G.prog>=100)finish()}
-function pump(){if(G.st!=='fight'||G.pump>0||G.sta>55)return;G.ten=Math.min(100,G.ten+18);G.dist-=7;G.sta-=6;G.pump=1;beep(500,.06)}
+function pump(){if(G.st!=='fight'||G.pump>0||G.sta>55)return;G.ten=Math.min(100,G.ten+18);G.dist-=7;G.sta-=6;G.pump=1}
 
 const WXN={clear:'cerah',rain:'hujan',storm:'badai',meteor:'hujan meteor',omen:'mencekam'},WXM={rain:'HUJAN TURUN. Ikan lebih aktif.',storm:'BADAI PETIR! Ikan langka lebih sering.',meteor:'HUJAN METEOR! Peluang MUTASI melonjak.',clear:'Cuaca cerah kembali.',omen:'SUASANA MENCEKAM...'};
 function setWx(w,say_=true){if(G.wx===w)return;G.wx=w;world.setWeather(w);if(!G.omen)setMood(w);if(say_&&G.st==='idle')say(WXM[w],3)}
