@@ -1,6 +1,6 @@
 import Papa from 'papaparse';
 import {World,setLocData,rideSpeed} from './world.js';
-import {sfx,unlock,setMood,setOpt} from './audio.js';
+import {sfx,unlock,setMood,setOpt,setScene,leaveFight,setTod,setDepth} from './audio.js';
 import {thumb,startViewer,stopViewer,MUT,RN,RC} from './fish3d.js';
 import './style.css';
 const $=(()=>{const m={};return s=>m[s]||(m[s]=document.querySelector(s))})(),KEY='tidal_tales_v1';
@@ -38,7 +38,7 @@ function parseFish(txt){return Papa.parse(txt.replace(/^\uFEFF/,''),{header:true
 const G={st:'idle',pw:0,pd:1,t:0,cd:6,bt:0,bw:1,f:null,ten:0,sta:100,dist:100,over:0,surge:0,sn:2,pump:0,reel:false,time:0,bait:null,pull:20,ct:0,cdur:1,slow:0,after:null,jumper:false,fx:0,msgT:0,wx:'clear',wxT:12,prog:0,en:0,eMax:0,eSum:0,eN:0,swT:0,swMax:1,swDir:null,swM:[],grace:2.5,tapP:0,spinV:0,aq:false,back:null,lastTap:0,fr:false,omenT:0,wxBack:'clear',ft:0,omen:false,swN:0,swD:0,swLast:null,swCur:0,hi:false};
 const cv=$('#cv'),M=$('#modal'),busy=()=>!M.hidden,world=new World(cv);
 const say=(t,s=2)=>{const m=$('#msg');m.textContent=t;m.hidden=!t;G.msgT=s};
-const reset=()=>{G.st='idle';G.f=null;G.reel=false;G.ten=0;G.sta=100;G.dist=100;G.surge=0;G.ct=0;G.swT=0;G.swDir=null;G.prog=0;G.en=0;G.hi=false;clearOmen()};
+const reset=()=>{G.st='idle';G.f=null;G.reel=false;G.ten=0;G.sta=100;G.dist=100;G.surge=0;G.ct=0;G.swT=0;G.swDir=null;G.prog=0;G.en=0;G.hi=false;clearOmen();leaveFight()};
 
 const addXp=n=>{S.xp+=n;let up=false;while(S.xp>=S.lv*120){S.xp-=S.lv*120;S.lv++;up=true}if(up){sfx('level');say('LEVEL NAIK: '+S.lv,2.2)}};
 const KEYS={},JOY={x:0,y:0,on:false},RS={xp:0,coins:0,pearls:0,gems:0,combo:0,ct:0,dist:0,boost:false};
@@ -61,7 +61,7 @@ function strike(){
  if(G.st==='wait'){say('Terlalu cepat!');sfx('miss');reset();return}
  if(G.st!=='bite')return;
  const ctl=R().control,ideal=G.t/G.bw>.08&&G.t/G.bw<.75,diff=RN.indexOf(G.f.rarity)*6+Math.min(10,G.f.weight/4),ch=cl(40+ctl*.25+HK().hook_bonus-diff+(ideal?15:-25),5,95);
- if(Math.random()*100<ch){G.st='fight';G.prog=20;G.en=0;G.eMax=0;G.eSum=0;G.eN=0;G.swT=0;G.swDir=null;{const ix_=RN.indexOf(G.f.rarity),n_=[4,4,5,7,8,10,12][ix_]+(G.f.mut?1:0);G.swN=n_;G.swD=0;G.swLast=null;G.swM=Array.from({length:n_},(_,k)=>+(24+k*(66/Math.max(1,n_-1))+rnd(-1,1)).toFixed(1))}G.grace=2.5;G.surge=0;G.sn=rnd(1.5,3);G.fr=false;G.lastTap=0;G.ft=0;
+ if(Math.random()*100<ch){G.st='fight';setScene('fight');G.prog=20;G.en=0;G.eMax=0;G.eSum=0;G.eN=0;G.swT=0;G.swDir=null;{const ix_=RN.indexOf(G.f.rarity),n_=[4,4,5,7,8,10,12][ix_]+(G.f.mut?1:0);G.swN=n_;G.swD=0;G.swLast=null;G.swM=Array.from({length:n_},(_,k)=>+(24+k*(66/Math.max(1,n_-1))+rnd(-1,1)).toFixed(1))}G.grace=2.5;G.surge=0;G.sn=rnd(1.5,3);G.fr=false;G.lastTap=0;G.ft=0;
   const r=G.f.weight/(LN().strength_kg*1.2),agg=/cepat|lincah|meledak|sangat|agresif|lompatan|ekstrem|kuat|boss|event/i.test(G.f.behavior)?1.3:1;
   G.pull=cl((12+30*Math.min(r,2))*agg,10,85);G.jumper=/lompat|meledak|lincah|cepat/i.test(G.f.behavior);G.dist=80;G.sta=80;
   world.ring(G.cd,'#ffffff',1.2);world.splash(G.cd,10);sfx('hook');say('TERKAIT! TAP TAP TAP!',1.4);hookOmen()}
@@ -208,9 +208,9 @@ function pushInput(dt){let x=JOY.x,y=JOY.y;if(!JOY.on){x=(KEYS.ArrowRight||KEYS.
  world.inp.x=x;world.inp.y=y;world.inp.boost=!!(KEYS.ShiftLeft||KEYS.ShiftRight||(G.st==='ride'&&KEYS.Space)||G.boostBtn);world.inp.dive=G.st==='ride'?(G.dive||((KEYS.KeyQ?1:0)-(KEYS.KeyE?1:0))):0;
  if(G.st==='ride'){RS.ct-=dt;if(RS.ct<=0)RS.combo=0;if(world.rd)RS.dist=world.rd.dist}}
 let last=0,errT=0,dts=.016;function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;
- try{pushInput(dt);if(G.slow>0)G.slow-=dt;let sd=G.slow>0?dt*.3:dt;if(G.st==='catch'&&G.hi){const p=G.ct/G.cdur;sd=dt*(p<.08?1:p<.32?.45:p<.46?.7:1)}if(!busy()||G.st==='result')update(sd);dts+=(sd-dts)*.4;world.frame(dts,G,S,R(),tod);fxDom()}
+ try{pushInput(dt);if(G.slow>0)G.slow-=dt;let sd=G.slow>0?dt*.3:dt;if(G.st==='catch'&&G.hi){const p=G.ct/G.cdur;sd=dt*(p<.08?1:p<.32?.45:p<.46?.7:1)}if(!busy()||G.st==='result')update(sd);dts+=(sd-dts)*.4;setTod(tod);setDepth(world.rd&&world.rd.ph==='ride'?world.rd.dep||0:0);world.frame(dts,G,S,R(),tod);fxDom()}
  catch(e){console.error(e);if(performance.now()-errT>4000){errT=performance.now();const ln=e&&e.stack?String(e.stack).split('\n')[1]||'':'';say('ERROR: '+(e&&e.message||e)+' '+ln.trim().slice(-60),6)}
-  if(world.rd){try{world.endRide()}catch(_){world.rd=null}G.st='idle';G.dive=0}}
+  if(world.rd){try{world.endRide()}catch(_){world.rd=null}G.st='idle';G.dive=0;setScene('game')}}
  requestAnimationFrame(loop)}
 const press=(e,fn)=>{e.addEventListener('pointerdown',ev=>{ev.preventDefault();fn(true)});['pointerup','pointerleave','pointercancel'].forEach(n=>e.addEventListener(n,()=>fn(false)))};
 press($('#bCast'),d=>d?startCharge():doCast());
@@ -224,9 +224,9 @@ let MENUS=[],AUTOS=[],TOPUPS=[];const ACT={play:()=>closeM(),shop:p=>shop(p||'ro
 const runMenu=m=>{const f=ACT[m.action];if(f)f(m.param)};
 const shopTabs=()=>MENUS.filter(m=>m.parent==='shop').sort((a,b)=>a.order-b.order).map(m=>[m.param,m.label]).reduce((a,x,i)=>{a.push(x);if(x[0]==='baits')a.push(['luck','Luck']);return a},[]);
 const fishOf=co=>{const b=FISH.find(x=>x.id===co.id),k=co.mk||Object.keys(MUT).find(z=>MUT[z].n===co.mut);return{...b,sc:Math.random(),mut:k?{k,...MUT[k]}:null,weight:co.w,len:co.len,sz:co.sz||''}};
-function closeAq(){G.aq=false;world.onAqLabel=null;$('#aqlab').hidden=true;world.setMode('game');$('#aqui').hidden=true}
+function closeAq(){G.aq=false;setScene('game');world.onAqLabel=null;$('#aqlab').hidden=true;world.setMode('game');$('#aqui').hidden=true}
 const aqOpen={};
-function aqua(pg=0){closeM();G.aq=true;const all=topInv(),NP=Math.max(1,Math.ceil(all.length/24));pg=Math.min(Math.max(0,pg),NP-1);const l=all.slice(pg*24,pg*24+24);world.setMode('aqua');world.aqFish(l.map(fishOf));world.azd=0;world.azm=1;let sel=-1;
+function aqua(pg=0){closeM();G.aq=true;setScene('aqua');const all=topInv(),NP=Math.max(1,Math.ceil(all.length/24));pg=Math.min(Math.max(0,pg),NP-1);const l=all.slice(pg*24,pg*24+24);world.setMode('aqua');world.aqFish(l.map(fishOf));world.azd=0;world.azm=1;let sel=-1;
  const u=$('#aqui');u.hidden=false;u.innerHTML='';
  const head=h('b','',`AKUARIUM | ${S.inv.length} ikan | halaman ${pg+1}/${NP} (24 per halaman, tertinggi dulu) | ukuran asli sesuai penggaris (1 m)`),act=h('div','btns aqact'),list=h('div','aqlist'),foot=h('div','pfoot aqfoot'),cb=[];
  const info=x=>`${x.mut?'MUTASI '+x.mut+' | ':''}${x.len} cm | ${x.w} kg`;
@@ -256,6 +256,7 @@ function rideMenu(){if(G.st!=='idle')return;const b=h('div'),mk=co=>{const f=fis
  b.append(btn('KEMBALI',closeM));modal('Naik Ikan',b,false,false,true)}
 function startFlex(co,back){closeM();closeAq();const f=fishOf(co);G.f=f;G.st='flex';G.ct=1;G.cdur=1;G.back=back||(()=>{reset();aqua()});world.startFlex(f,RN.indexOf(f.rarity));sfx('catch',Math.min(3,RN.indexOf(f.rarity)))}
 let pd=null;const APP=$('#app');
+addEventListener('pointerdown',e=>{const b=e.target&&e.target.closest&&e.target.closest('button');if(b&&!b.closest('#hud,#rideui,#joy'))sfx('ui')},true);
 APP.addEventListener('pointerdown',e=>{unlock();if(e.target.closest('input,#modal,#dock,#aqui,#flexui,#joy,#rideui'))return;pd={x:e.clientX,y:e.clientY,mv:0};if(G.st==='fight'&&G.swT<=0&&!e.target.closest('button'))tap()});
 APP.addEventListener('pointermove',e=>{if(!pd)return;const dx=e.clientX-pd.x,dy=e.clientY-pd.y;pd.mv=Math.max(pd.mv||0,Math.hypot(dx,dy));
  if(G.st==='fight'&&G.swT>0){if(Math.hypot(dx,dy)>50){swipe(Math.abs(dx)>Math.abs(dy)?(dx<0?'L':'R'):(dy<0?'U':'D'));pd=null}}
@@ -294,7 +295,7 @@ $('#bPhoto').onclick=()=>{const a=document.createElement('a');a.href=world.snap(
   else if(k==='t'){const c=Math.round(80*mu*dm);S.coins+=c;RS.coins+=c;S.gem+=2;RS.gems+=2;addXp(60);RS.xp+=60;say(`PETI HARTA! +${c} koin +2 kristal`,1.5)}
   else{const base=Math.round({p:3,g:15}[k]*mu*dm);S.coins+=base;RS.coins+=base;if(k==='p')RS.pearls++;addXp(k==='g'?4:1);say(`${k==='g'?'MUTIARA EMAS':'Mutiara'} +${base}`,.7)}
   sfx('tap',Math.min(1,RS.combo/9))};
- world.onRide=ev=>{if(ev==='mounted')sfx('ok');if(ev==='o2low')say('OKSIGEN HABIS! Naik ke permukaan...',2.5);if(ev==='end')G.dive=0;if(ev==='end'){G.st='idle';S.stats.ride=(S.stats.ride||0)+Math.round(RS.dist*.6);S.stats.pearls=(S.stats.pearls||0)+RS.pearls;const md=world.lastRide?world.lastRide.maxd:0;S.stats.maxd=Math.max(S.stats.maxd||0,md);save();say(`Turun dari ikan. Jarak ${Math.round(RS.dist*.6)} m | terdalam ${md.toFixed(1)} m | +${RS.coins} koin | +${RS.xp} XP`,3.8)}};
+ world.onRide=ev=>{if(ev==='mounted'){sfx('ok');setScene('ride')}if(ev==='o2low')say('OKSIGEN HABIS! Naik ke permukaan...',2.5);if(ev==='end'){G.dive=0;setScene('game')}if(ev==='end'){G.st='idle';S.stats.ride=(S.stats.ride||0)+Math.round(RS.dist*.6);S.stats.pearls=(S.stats.pearls||0)+RS.pearls;const md=world.lastRide?world.lastRide.maxd:0;S.stats.maxd=Math.max(S.stats.maxd||0,md);save();say(`Turun dari ikan. Jarak ${Math.round(RS.dist*.6)} m | terdalam ${md.toFixed(1)} m | +${RS.coins} koin | +${RS.xp} XP`,3.8)}};
  boot(55,'Membangun pulau dan lautan...');await nextFrame();world.build(S.loc);boot(76,'Memanaskan mesin grafis...');await nextFrame();try{world.frame(.016,G,S,R(),tod)}catch(e){console.error(e)}boot(84,'Menyusun shader dan cahaya...');await nextFrame();world.warm();boot(94,'Menyiapkan koleksi ikan...');await nextFrame();
  hud();requestAnimationFrame(loop);boot(100,'Siap memancing!');await bootEnd();home()})().catch(e=>{console.error(e);bootErr(e)});
 
