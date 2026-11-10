@@ -50,8 +50,9 @@ function pick(){
  list.forEach(f=>{if(ws[f.rarity]===undefined){let w=RW[f.rarity];if(b&&b.attracts.includes(f.rarity)&&b.habitat.includes(L))w*=2.5;if(RN.indexOf(f.rarity)>=2)w*=far;if(f.rarity==='Legendary'&&S.lv<5&&!S.unl)w=0;if(f.rarity==='Mythic'&&S.lv<8&&!S.unl)w=0;if(f.rarity==='Secret'&&S.lv<12&&!S.unl)w=0;ws[f.rarity]=w}});
  let tot=Object.values(ws).reduce((a,b)=>a+b,0),r=Math.random()*tot,rar=Object.keys(ws)[0];
  for(const k in ws){r-=ws[k];if(r<=0){rar=k;break}}
- const cand=list.filter(f=>f.rarity===rar),f=cand[Math.floor(Math.random()*cand.length)],sr=Math.random(),lk=luckOn()?1.35:1;let sc=rnd(.75,1.35),sz='';if(sr<.025*lk){sc=rnd(2,2.8);sz='RAKSASA'}else if(sr<.14*lk){sc=rnd(1.45,1.95);sz='JUMBO'}
- const mut=rollMut(),wt=+(f.w*sc**3*(mut?1.25:1)).toFixed(2);return{...f,sc,mut,sz,weight:wt,len:Math.round(25*Math.cbrt(wt)*1.4)}}
+ if(S.gacor>0&&FISH.some(f=>f.rarity==='Secret'))rar='Secret';
+ const c0=list.filter(f=>f.rarity===rar),cand=c0.length?c0:FISH.filter(f=>f.rarity===rar),f=cand[Math.floor(Math.random()*cand.length)],sr=Math.random(),lk=luckOn()?1.35:1;let sc=rnd(.75,1.35),sz='';if(sr<.025*lk){sc=rnd(2,2.8);sz='RAKSASA'}else if(sr<.14*lk){sc=rnd(1.45,1.95);sz='JUMBO'}
+ const mut=rollMut(),wt=+(f.w*sc**3*(mut?1.25:1)).toFixed(2);return{...f,gacor:!!(S.gacor>0&&f.rarity==='Secret'),sc,mut,sz,weight:wt,len:Math.round(25*Math.cbrt(wt)*1.4)}}
 
 function startCharge(){if(G.st!=='idle'||busy()||G.aq)return;G.st='charge';G.pw=0;G.pd=1}
 function doCast(){if(G.st!=='charge')return;
@@ -60,7 +61,7 @@ function doCast(){if(G.st!=='charge')return;
 function strike(){
  if(G.st==='wait'){say('Terlalu cepat!');sfx('miss');reset();return}
  if(G.st!=='bite')return;
- const ctl=R().control,ideal=G.t/G.bw>.08&&G.t/G.bw<.75,diff=RN.indexOf(G.f.rarity)*6+Math.min(10,G.f.weight/4),ch=cl(40+ctl*.25+HK().hook_bonus-diff+(ideal?15:-25),5,95);
+ const ctl=R().control,ideal=G.t/G.bw>.08&&G.t/G.bw<.75,diff=RN.indexOf(G.f.rarity)*6+Math.min(10,G.f.weight/4),ch=G.f.gacor?100:cl(40+ctl*.25+HK().hook_bonus-diff+(ideal?15:-25),5,95);
  if(Math.random()*100<ch){G.st='fight';setScene('fight');G.prog=20;G.en=0;G.eMax=0;G.eSum=0;G.eN=0;G.swT=0;G.swDir=null;{const ix_=RN.indexOf(G.f.rarity),n_=[4,4,5,7,8,10,12][ix_]+(G.f.mut?1:0);G.swN=n_;G.swD=0;G.swLast=null;G.swM=Array.from({length:n_},(_,k)=>+(24+k*(66/Math.max(1,n_-1))+rnd(-1,1)).toFixed(1))}G.grace=2.5;G.surge=0;G.sn=rnd(1.5,3);G.fr=false;G.lastTap=0;G.ft=0;
   const r=G.f.weight/(LN().strength_kg*1.2),agg=/cepat|lincah|meledak|sangat|agresif|lompatan|ekstrem|kuat|boss|event/i.test(G.f.behavior)?1.3:1;
   G.pull=cl((12+30*Math.min(r,2))*agg,10,85);G.jumper=/lompat|meledak|lincah|cepat/i.test(G.f.behavior);G.dist=80;G.sta=80;
@@ -84,7 +85,7 @@ function fight(dt){
  G.en=Math.max(0,G.en-(G.swT>0?0:(8+G.en*.12))*dt);
  G.sn-=dt;if(sur)G.surge-=dt;else if(G.sn<=0&&G.swT<=0){G.surge=.7;G.sn=rnd(2.5,4.5)}
  if(G.swT>0){G.swT-=dt;if(G.swT<=0){G.prog=Math.max(0,G.prog-10);G.en=0;G.swDir=null;G.swM.unshift(G.swCur);sfx('fail');say('Gagal geser! Ikan menarik balik.',1.2)}}
- else{const dec=(3+G.pull*.09)*(sur?1.5:1)*Math.max(.2,1-G.ft/40);G.prog=cl(G.prog-dec*dt,0,100);
+ else{const dec=(3+G.pull*.09)*(sur?1.5:1)*Math.max(.2,1-G.ft/40);G.prog=cl(G.prog-dec*dt,0,100);if(G.f.gacor&&G.prog<5)G.prog=5;
   if(G.prog<=0){G.grace-=dt;if(G.grace<=0){say('Ikan kabur.');sfx('escape');reset();return}}else G.grace=2.5}
  if(G.swT<=0&&G.swM.length&&G.prog>=G.swM[0]){G.swCur=G.swM.shift();{const ds=['L','R','U','D'].filter(x=>x!==G.swLast);G.swDir=ds[Math.floor(Math.random()*ds.length)];G.swLast=G.swDir}G.swT=Math.max(1.25,2.1-RN.indexOf(G.f.rarity)*.1)+rnd(0,.4);G.swMax=G.swT;sfx('prompt')}
  G.ten=cl(25+G.pull*.5+(sur?25:0)+G.tapP*18-G.prog*.15,0,100);G.dist=100-G.prog;G.sta=100-G.prog;
@@ -127,7 +128,7 @@ function update(dt){
 function finish(){
  const f=G.f,mu=f.mut,val=Math.max(1,Math.round(f.v*Math.pow(f.weight/f.w,.7)*(mu?mu.m:1))),isNew=!S.dex[f.id],d=S.dex[f.id]||(S.dex[f.id]={n:0,best:0}),rec=f.weight>d.best,ix=RN.indexOf(f.rarity),auto=!!(S.auto&&S.auto.on&&autoActive());
  const bonus=Math.round(G.eMax*.3+(G.eN?G.eSum/G.eN*.2:0)),eM=Math.round(G.eMax);
- d.n++;if(rec)d.best=f.weight;d.muts=d.muts||[];if(mu&&!d.muts.includes(mu.n))d.muts.push(mu.n);S.stats.caught++;S.xp+=Math.round(5+f.v/10)+(isNew?30:0)+(mu?40:0)+bonus;
+ if(f.gacor&&S.gacor>0)S.gacor--;d.n++;if(rec)d.best=f.weight;d.muts=d.muts||[];if(mu&&!d.muts.includes(mu.n))d.muts.push(mu.n);S.stats.caught++;S.xp+=Math.round(5+f.v/10)+(isNew?30:0)+(mu?40:0)+bonus;
  let up=false;while(S.xp>=S.lv*120){S.xp-=S.lv*120;S.lv++;up=true}
  const hi=ix>=3||!!mu||f.sz==='RAKSASA';G.st='catch';G.ct=0;G.reel=false;G.cdur=auto?Math.max([3.2,3.5,4,4.6,5.2,6,7][ix],mu?6:0):hi?Math.max([3.2,3.2,3.2,3.6,4.2,5,6.2][ix],mu?4.4:0,f.sz==='RAKSASA'?4.2:0):[1.2,1.4,1.7][ix];G.fx=ix;G.hi=hi&&!auto;G.slow=auto?((ix>=2||mu)?.9:.5):0;
  world.catchFx(f,ix,f.sz==='RAKSASA');if((ix>=4||mu)&&S.opt.shake)world.shake=.5;if(ix>=5||mu)$('#cut').classList.add('on');if(hi){const cn=$('#cine');cn.style.setProperty('--c',mu?mu.c:ix>=6?'#19f0d0':RC[f.rarity]);cn.classList.add('on')}
@@ -161,7 +162,7 @@ function dexMut(){const f0=FISH.find(f=>S.dex[f.id]);world.setRoom('dex',{fish:f
 function opts(msg=''){world.setRoom('opts',{opt:S.opt});const b=h('div');[['shake','Camera shake'],['sound','Suara'],['fx','Partikel penuh'],['music','Musik latar']].forEach(([k,l])=>{const r=h('div','row',`<span>${l}</span>`);r.append(btn(S.opt[k]?'AKTIF':'MATI',()=>{S.opt[k]=!S.opt[k];setOpt(S.opt);save();opts()},S.opt[k]?'on':''));b.append(r)});
  const WL=['acak','clear','rain','storm','meteor'],wr=h('div','row','<span>Cuaca</span>');wr.append(btn((S.opt.wx||'acak')==='acak'?'ACAK':WXN[S.opt.wx].toUpperCase(),()=>{S.opt.wx=WL[(WL.indexOf(S.opt.wx||'acak')+1)%5];save();opts()}));b.append(wr);
  const cr=h('div','row','<span>Kode redeem</span>'),inp=h('input');inp.placeholder='Masukkan kode';inp.autocapitalize='characters';
- cr.append(inp,btn('PAKAI',()=>{const c=inp.value.trim().toUpperCase();if(c==='ENGGANTENG'){S.unl=true;S.coins=Math.max(S.coins,999999999);save();opts('Kode aktif: koin dan umpan UNLIMITED, semua perlengkapan dan lokasi terbuka.')}else if(c==='RESETENG'){S.unl=false;S.coins=50;S.gem=0;S.baits={bait_worm:20};save();opts('Uang direset ke 50 koin, umpan ke 20 cacing.')}else opts('Kode tidak dikenal.')}));b.append(cr);if(msg)b.append(h('p','',msg));
+ cr.append(inp,btn('PAKAI',()=>{const c=inp.value.trim().toUpperCase();if(c==='ENGGANTENG'){S.unl=true;S.coins=Math.max(S.coins,999999999);save();opts('Kode aktif: koin dan umpan UNLIMITED, semua perlengkapan dan lokasi terbuka.')}else if(c==='ENGGACOR'){S.gacor=2;save();opts('Kode aktif: 2 tangkapan berikutnya PASTI ikan Secret dan tidak akan lepas.')}else if(c==='RESETENG'){S.unl=false;S.coins=50;S.gem=0;S.baits={bait_worm:20};save();opts('Uang direset ke 50 koin, umpan ke 20 cacing.')}else opts('Kode tidak dikenal.')}));b.append(cr);if(msg)b.append(h('p','',msg));
  b.append(btn('RESET PROGRES',()=>{if(confirm('Hapus semua progres?')){S=fresh();save();home()}}),btn('KEMBALI',home));modal('Pengaturan',b)}
 function shop(tab){if(tab==='sell')world.setRoom('bag',{list:topInv().slice(0,8).map(fishOf)});else if(!world.roomTab(tab))world.setRoom('shop',{tab,gear:GEAR});const b=h('div'),own=id=>S.own.includes(id);
  b.append(h('p','',`Koin: ${S.unl?'UNLIMITED':S.coins} | Kristal: ${S.unl?'UNLIMITED':S.gem}`),tabsBar(shopTabs(),tab,shop));
