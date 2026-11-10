@@ -172,3 +172,22 @@ button:disabled{filter:grayscale(.6);opacity:.55}
 html,body,#app{overscroll-behavior:none}
 button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 #modal.sheet:has(.mlogo) .panel{will-change:transform}
+
+/* ===== tombol KEMBALI/TUTUP tetap di bawah (tidak ikut tergulir) + menu Naik Ikan melayang ===== */
+.panel{display:flex;flex-direction:column;overflow:hidden;padding:0}
+.pbody{flex:1 1 auto;min-height:0;overflow:auto;padding:16px 16px 10px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.pfoot{flex:none;display:flex;gap:10px;padding:4px 14px 12px;border-top:3px solid #0d2a57;background:#123066}
+.pfoot button{flex:1 1 0;min-width:0;min-height:44px}
+button.back{--c:#c9473a;--d:#8a2c22;--l:#f09a8f;--t:#ffffff}
+#modal.sheet:has(.mlogo) .panel{overflow:hidden}
+#modal.full{align-items:center;justify-content:center;padding:12px 12px calc(12px + env(safe-area-inset-bottom,0px));background:#0a122080}
+#modal.full .panel{width:min(560px,100%);height:calc(100dvh - 90px);max-height:calc(100dvh - 90px);box-shadow:0 18px 40px rgba(0,0,0,.55),inset 3px 3px 0 #3f78c8}
+/* ===== akuarium: daftar per tier, aksi di atas, tombol zoom/tutup tetap di bawah ===== */
+#aqui{display:flex;flex-direction:column;overflow:hidden;padding:0;max-height:54%}
+#aqui>b{flex:none;display:block;padding:8px 12px 4px;font-size:12px;line-height:1.3}
+#aqui .aqact{flex:none;padding:0 12px;grid-template-columns:repeat(4,1fr);gap:6px}
+#aqui .aqact button{font-size:10.5px;padding:9px 4px 7px;min-width:0}
+#aqui .aqlist{flex:1 1 auto;min-height:0;overflow:auto;padding:2px 12px 8px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+#aqui .aqfoot{display:grid;gap:8px;padding:4px 12px 10px}
+#aqui .aqfoot button{min-width:0;padding-left:4px;padding-right:4px}
+.row.picked{outline:2px solid #ffe08a;outline-offset:-2px}
