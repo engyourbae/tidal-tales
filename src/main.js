@@ -23,7 +23,6 @@ const it=(k,id)=>GEAR[k].find(x=>x.id===id),R=()=>it('rods',S.rod),RL=()=>it('re
 const cl=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a),hash=s=>[...s].reduce((a,c)=>a*31+c.charCodeAt(0)>>>0,7);
 const h=(t,c='',x='')=>{const e=document.createElement(t);e.className=c;e.innerHTML=x;return e};
 const btn=(t,fn,c='')=>{const b=h('button',c,t);b.onclick=fn;return b};
-let ac;const beep=(f,d=.08,ty='square')=>{if(!S.opt.sound)return;try{ac=ac||new AudioContext();const o=ac.createOscillator(),g=ac.createGain();o.type=ty;o.frequency.value=f;g.gain.value=.04;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch{}};
 
 const BOOT=$('#boot'),bt0=performance.now(),TIPS=['Geser layar sesuai arah panah saat ikan besar menarik. Makin langka ikannya, makin banyak geseran!','Coba mancing di tepi pulau: jalan lewat jembatan kayu atau tekan PINDAH SPOT.','Naik ikan lalu selam sampai 14 meter untuk peti harta dan bintang XP.','Tanda !? di atas kepala karakter menunjukkan tier ikan yang menyambar umpanmu.','Ikan Secret hanya muncul untuk pemancing level 12 ke atas. Waspadai suasana mencekam!'];let bp=0;
 const boot=(p,t)=>{bp=Math.max(bp,p);const f=$('#bfill');if(f)f.style.width=bp+'%';const x=$('#btxt');if(x&&t)x.textContent=t;const pc=$('#bpct');if(pc)pc.textContent=Math.round(bp)+'%'};
@@ -90,7 +89,7 @@ function fight(dt){
  if(G.swT<=0&&G.swM.length&&G.prog>=G.swM[0]){G.swCur=G.swM.shift();{const ds=['L','R','U','D'].filter(x=>x!==G.swLast);G.swDir=ds[Math.floor(Math.random()*ds.length)];G.swLast=G.swDir}G.swT=Math.max(1.25,2.1-RN.indexOf(G.f.rarity)*.1)+rnd(0,.4);G.swMax=G.swT;sfx('prompt')}
  G.ten=cl(25+G.pull*.5+(sur?25:0)+G.tapP*18-G.prog*.15,0,100);G.dist=100-G.prog;G.sta=100-G.prog;
  if(G.prog>=100)finish()}
-function pump(){if(G.st!=='fight'||G.pump>0||G.sta>55)return;G.ten=Math.min(100,G.ten+18);G.dist-=7;G.sta-=6;G.pump=1;beep(500,.06)}
+function pump(){if(G.st!=='fight'||G.pump>0||G.sta>55)return;G.ten=Math.min(100,G.ten+18);G.dist-=7;G.sta-=6;G.pump=1}
 
 const WXN={clear:'cerah',rain:'hujan',storm:'badai',meteor:'hujan meteor',omen:'mencekam'},WXM={rain:'HUJAN TURUN. Ikan lebih aktif.',storm:'BADAI PETIR! Ikan langka lebih sering.',meteor:'HUJAN METEOR! Peluang MUTASI melonjak.',clear:'Cuaca cerah kembali.',omen:'SUASANA MENCEKAM...'};
 function setWx(w,say_=true){if(G.wx===w)return;G.wx=w;world.setWeather(w);if(!G.omen)setMood(w);if(say_&&G.st==='idle')say(WXM[w],3)}
@@ -119,7 +118,7 @@ function update(dt){
  if(s==='charge'){G.pw+=G.pd*110*dt;if(G.pw>=100||G.pw<=0){G.pd*=-1;G.pw=cl(G.pw,0,100)}}
  else if(s==='cast'){G.t+=dt;if(G.t>=.7){G.st='wait';G.t=0;G.bt=rnd(2,6)*(G.bait?.7:1)*({rain:.85,storm:.7,meteor:.8}[G.wx]||1)*(world.spot==='kiri'?.8:1);world.splash(G.cd,16);world.ring(G.cd,'#dfeaf2',2.2);sfx('splash')}}
  else if(s==='wait'){G.t+=dt;if(Math.floor(G.t*.9)!==Math.floor((G.t-dt)*.9))world.ring(G.cd,'#dfeaf2',.9);
-  if(G.t>=G.bt){G.st='bite';G.t=0;G.bw=1.1+R().control*.012;G.f=pick();for(let i=0;i<3;i++)setTimeout(()=>world.ring(G.cd,'#ffffff',1.6),i*180);sfx('bite');say('IKAN MENGGIGIT! TEKAN STRIKE',G.bw)}}
+  if(G.t>=G.bt){G.st='bite';G.t=0;G.bw=1.1+R().control*.012;G.f=pick();for(let i=0;i<3;i++)setTimeout(()=>world.ring(G.cd,'#ffffff',1.6),i*180);sfx('catch',Math.max(0,RN.indexOf(G.f.rarity)));say('IKAN MENGGIGIT! TEKAN STRIKE',G.bw)}}
  else if(s==='bite'){G.t+=dt;if(G.t>G.bw){say('Terlambat. Ikan pergi.');sfx('miss');reset()}}
  else if(s==='fight')fight(dt);
  else if(s==='catch'){G.ct+=dt;if(G.ct>=G.cdur){G.st='result';G.after()}}
@@ -135,7 +134,7 @@ function finish(){
  
  const bn=[];{if(f.sz)bn.push(`<div class="bn" style="background:#b8321f">${f.sz}! ${f.weight} KG</div>`);if(ix>=3)bn.push(`<div class="bn" style="background:${RC[f.rarity]}">${f.rarity.toUpperCase()}</div>`);if(mu){bn.push(`<div class="bn m" style="background:${mu.c}">MUTASI ${mu.n.toUpperCase()}</div>`);bn.push(`<div class="bn m" style="background:#3a1020;animation-delay:.7s">SUASANA MENCEKAM...</div>`)}}
  const B=$('#banner');B.innerHTML=bn.join('');B.hidden=!bn.length;
- {sfx('catch',ix);if(mu)setTimeout(()=>sfx('mut'),250);if(up)setTimeout(()=>sfx('level'),900)}save();
+ {if(ix>=6)sfx('secretok');if(mu)setTimeout(()=>sfx('mut'),250);if(up)setTimeout(()=>sfx('level'),900)}save();
  const co={id:f.id,w:f.weight,len:f.len,val,r:f.rarity,sz:f.sz||'',mut:mu?mu.n:'',mk:mu?mu.k:''},done=()=>{stopViewer();closeM();reset();$('#cut').classList.remove('on');$('#cine').classList.remove('on');B.hidden=true};
  G.after=()=>{const b=h('div');b.append(startViewer(f),h('div','big',f.name),h('div','',`<span class="tag" style="background:${RC[f.rarity]}">${f.rarity.toUpperCase()}</span> ${f.sz?`<span class="tag" style="background:#b8321f">${f.sz}</span> `:''}${mu?`<span class="tag" style="background:${mu.c}">MUTASI ${mu.n.toUpperCase()} x${mu.m}</span> `:''}${isNew?'<b>SPESIES BARU</b> ':''}${rec&&!isNew?'<b>REKOR BERAT</b>':''}`),
   h('div','row',`<span>Panjang ${f.len} cm</span><span>Berat ${f.weight} kg</span><span>Nilai ${val} koin</span>`),h('div','',`Bonus energi tap: +${bonus} XP (puncak ${eM}%)`),up?h('div','',`<b>LEVEL NAIK: ${S.lv}</b>`):h('span'));
