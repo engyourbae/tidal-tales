@@ -10,7 +10,7 @@ const lazyT=el=>el&&lazyP(el,el,'textContent','_tv'),lazyW=el=>el&&lazyP(el,el.s
 const RW={Common:55,Uncommon:25,Rare:13,Epic:5,Legendary:1.7,Mythic:.3,Secret:.12};
 const LOCS=[{n:'Willow Lake',lv:1,sky:'#a9d6e5',wat:'#2f7f9e',bank:'#5b7f4a'},{n:'Misty River',lv:3,sky:'#c3cfd4',wat:'#4a7a86',bank:'#6f7d52'},{n:'Mangrove Marsh',lv:6,sky:'#b9c79a',wat:'#5a6b3c',bank:'#3e4f2c'},{n:'Coral Bay',lv:10,sky:'#8fd3dc',wat:'#1f93a8',bank:'#d8c48a'},{n:'Abyssal Trench',lv:15,sky:'#2b3a5c',wat:'#101c3a',bank:'#262e44'}];
 const CAP=100,TR=x=>RN.indexOf(x.r),isTop=x=>TR(x)>=4||(!!x.mut&&TR(x)>=3),nNorm=()=>S.inv.reduce((a,x)=>a+(isTop(x)?0:1),0),topInv=()=>S.inv.slice().sort((a,b)=>(TR(b)-TR(a))||((b.mut?1:0)-(a.mut?1:0))||(b.val-a.val));
-function stash(co){if(isTop(co)||nNorm()<CAP){S.inv.push(co);return 1}let wi=-1;S.inv.forEach((x,i)=>{if(!isTop(x)&&!x.fav&&(wi<0||x.val<S.inv[wi].val))wi=i});const w=S.inv[wi];if(w&&co.val>w.val){S.coins+=w.val;S.inv.splice(wi,1);S.inv.push(co);return 2}S.coins+=co.val;return 0}
+function stash(co){if(isTop(co)||nNorm()<CAP){S.inv.push(co);return 1}const lo=(a,c)=>(TR(a)-TR(c))||(a.val-c.val);let wi=-1;S.inv.forEach((x,i)=>{if(!isTop(x)&&!x.fav&&(wi<0||lo(x,S.inv[wi])<0))wi=i});const w=S.inv[wi];if(w&&lo(co,w)>0){S.coins+=w.val;S.inv.splice(wi,1);S.inv.push(co);return 2}S.coins+=co.val;return 0}
 const bagOpen={};
 function sellBtn(label,need2,fn,guard){const b=btn(label,()=>{const m=guard&&guard();if(m){say(m,2.6);return}if(!need2||b._c){fn();return}b._c=1;b.textContent='YAKIN JUAL? PENCET LAGI';b.classList.add('warn2');setTimeout(()=>{if(b.isConnected){b._c=0;b.textContent=label;b.classList.remove('warn2')}},4000)});return b}
 const TODS=['siang','senja','malam'],SPOTN={dermaga:'Dermaga',kiri:'Pulau Kiri',kanan:'Pulau Kanan'};
@@ -138,11 +138,13 @@ function finish(){
  const co={id:f.id,w:f.weight,len:f.len,val,r:f.rarity,sz:f.sz||'',mut:mu?mu.n:'',mk:mu?mu.k:''},done=()=>{stopViewer();closeM();reset();$('#cut').classList.remove('on');$('#cine').classList.remove('on');B.hidden=true};
  G.after=()=>{const b=h('div');b.append(startViewer(f),h('div','big',f.name),h('div','',`<span class="tag" style="background:${RC[f.rarity]}">${f.rarity.toUpperCase()}</span> ${f.sz?`<span class="tag" style="background:#b8321f">${f.sz}</span> `:''}${mu?`<span class="tag" style="background:${mu.c}">MUTASI ${mu.n.toUpperCase()} x${mu.m}</span> `:''}${isNew?'<b>SPESIES BARU</b> ':''}${rec&&!isNew?'<b>REKOR BERAT</b>':''}`),
   h('div','row',`<span>Panjang ${f.len} cm</span><span>Berat ${f.weight} kg</span><span>Nilai ${val} koin</span>`),h('div','',`Bonus energi tap: +${bonus} XP (puncak ${eM}%)`),up?h('div','',`<b>LEVEL NAIK: ${S.lv}</b>`):h('span'));
-  const bs=h('div','btns'),fv=btn(co.fav?'★ FAVORIT':'☆ FAVORIT',()=>{co.fav=!co.fav;fv.textContent=co.fav?'★ FAVORIT':'☆ FAVORIT';fv.classList.toggle('on',!!co.fav)},co.fav?'on':'');bs.append(sellBtn('JUAL',isTop(co),()=>{S.coins+=val;save();done()},()=>co.fav?'Ikan favorit tidak bisa dijual. Buka bintangnya dulu.':''),btn('SIMPAN',()=>{const r=stash(co);save();say(r===2?'Tas biasa penuh: ikan biasa termurah dijual otomatis.':r===0?'Tas biasa penuh dan isinya lebih berharga: ikan ini dijual.':isTop(co)?'Disimpan di Tas (ikan langka, di luar batas '+CAP+')':'Disimpan di Tas ('+nNorm()+'/'+CAP+')',2.8);done()}),fv,btn('LEPAS',()=>{S.xp+=2;save();done()}),btn('PAMER',()=>{closeM();G.st='flex';G.back=()=>{G.st='result';G.after()}}));b.append(bs);modal('Tangkapan',b,true)};
- if(auto)G.after=()=>{const r=stash(co);save();if(r!==1)say(r===0?'Tas biasa penuh: '+f.name+' dijual.':'Tas biasa penuh: ikan termurah dijual untuk '+f.name+'.',2.4);autoT=3;done()}}
+  const bs=h('div','btns'),fv=btn(co.fav?'★ FAVORIT':'☆ FAVORIT',()=>{co.fav=!co.fav;fv.textContent=co.fav?'★ FAVORIT':'☆ FAVORIT';fv.classList.toggle('on',!!co.fav)},co.fav?'on':'');bs.append(sellBtn('JUAL',isTop(co),()=>{S.coins+=val;save();done()},()=>co.fav?'Ikan favorit tidak bisa dijual. Buka bintangnya dulu.':''),btn('SIMPAN',()=>{const r=stash(co);save();say(r===2?'Tas biasa penuh: ikan biasa tier terendah dijual otomatis.':r===0?'Tas biasa penuh dan isinya lebih berharga: ikan ini dijual.':isTop(co)?'Disimpan di Tas (ikan langka, di luar batas '+CAP+')':'Disimpan di Tas ('+nNorm()+'/'+CAP+')',2.8);done()}),fv,btn('LEPAS',()=>{S.xp+=2;save();done()}),btn('PAMER',()=>{closeM();G.st='flex';G.back=()=>{G.st='result';G.after()}}));b.append(bs);modal('Tangkapan',b,true)};
+ if(auto)G.after=()=>{const r=stash(co);save();if(r!==1)say(r===0?'Tas biasa penuh: '+f.name+' dijual.':'Tas biasa penuh: ikan tier terendah dijual untuk '+f.name+'.',2.4);autoT=3;done()}}
 
 /* ===== UI ===== */
-function modal(t,b,lite,logo){M.innerHTML='';M.className=lite?'lite':'sheet';const p=h('div','panel');if(logo){const im=h('img','mlogo');im.src=import.meta.env.BASE_URL+'logo.png';im.alt='Tidal Tales';p.append(im)}p.append(h('h2','',t),b);M.append(p);M.hidden=false;$('#hud').hidden=true;$('#dock').hidden=true}
+function modal(t,b,lite,logo,full){M.innerHTML='';M.className=(lite?'lite':'sheet')+(full?' full':'');const p=h('div','panel'),body=h('div','pbody'),foot=h('div','pfoot');if(logo){const im=h('img','mlogo');im.src=import.meta.env.BASE_URL+'logo.png';im.alt='Tidal Tales';body.append(im)}body.append(h('h2','',t),b);
+ [...b.querySelectorAll('button')].filter(x=>/^(KEMBALI|TUTUP)$/i.test((x.textContent||'').trim())).forEach(x=>{x.classList.add('back');foot.append(x)});
+ p.append(body);if(foot.childElementCount)p.append(foot);M.append(p);M.hidden=false;$('#hud').hidden=true;$('#dock').hidden=true}
 const closeM=()=>{stopViewer();M.hidden=true;M.innerHTML='';if(world.mode==='room')world.setMode('game')};
 const tabsBar=(names,cur,fn)=>{const t=h('div','tabs');names.forEach(n=>t.append(btn(n[1],()=>fn(n[0]),n[0]===cur?'on':'')));return t};
 function home(){if(world.mode==='room')world.setMode('game');const b=h('div'),s=h('div','btns');b.append(h('p','',`Level ${S.lv} | ${S.unl?'UNLIMITED':S.coins} koin | ${S.unl?'UNL':S.gem} kristal | ${nNorm()}/${CAP} biasa + ${S.inv.length-nNorm()} langka di tas`));
@@ -183,7 +185,7 @@ function shop(tab){if(tab==='sell')world.setRoom('bag',{list:topInv().slice(0,8)
   AUTOS.forEach(p=>{const perm=Number(p.hours)===0,cost=perm?p.gem_price:p.coin_price,have=perm?S.gem:S.coins,ok=S.unl||have>=cost;
    row(p.name,`${p.desc} | ${cost} ${perm?'Kristal':'koin'}`,[btn(ok?`BELI ${cost}`:(perm?'TOP UP DULU':'KOIN KURANG'),()=>{if(!ok){if(perm)return shop('topup');return alert('Koin kurang.')}
     if(!S.unl){if(perm)S.gem-=cost;else S.coins-=cost}if(perm)S.auto.perm=true;else S.auto.until=Math.max(Date.now(),S.auto.until)+p.hours*3600e3;save();shop('auto')})])});
-  row('Hasil Auto','Ikan otomatis masuk Tas dan Akuarium (maks '+CAP+' ikan biasa). Kalau penuh, ikan biasa termurah yang tidak berbintang dijual otomatis. Legendary, Mythic, Secret, mutasi Epic ke atas, dan ikan berbintang tidak pernah dijual otomatis.',[])}
+  row('Hasil Auto','Ikan otomatis masuk Tas dan Akuarium (maks '+CAP+' ikan biasa). Kalau penuh, ikan biasa dengan tier terendah (lalu yang termurah) yang tidak berbintang dijual otomatis. Legendary, Mythic, Secret, mutasi Epic ke atas, dan ikan berbintang tidak pernah dijual otomatis.',[])}
  if(tab==='topup'){b.append(h('p','',`Kristal: ${S.unl?'UNLIMITED':S.gem}. Mode simulasi: belum ada pembayaran sungguhan.`));TOPUPS.forEach(p=>row(p.label,`${p.gems} Kristal | ${p.price_label}`,[btn('TOP UP',()=>{if(confirm(`SIMULASI: tambah ${p.gems} Kristal tanpa pembayaran?`)){S.gem+=Number(p.gems);save();shop('topup')}})]))}
  b.append(btn('KEMBALI',home));modal('Toko',b)}
 
@@ -223,19 +225,26 @@ const runMenu=m=>{const f=ACT[m.action];if(f)f(m.param)};
 const shopTabs=()=>MENUS.filter(m=>m.parent==='shop').sort((a,b)=>a.order-b.order).map(m=>[m.param,m.label]).reduce((a,x,i)=>{a.push(x);if(x[0]==='baits')a.push(['luck','Luck']);return a},[]);
 const fishOf=co=>{const b=FISH.find(x=>x.id===co.id),k=co.mk||Object.keys(MUT).find(z=>MUT[z].n===co.mut);return{...b,sc:Math.random(),mut:k?{k,...MUT[k]}:null,weight:co.w,len:co.len,sz:co.sz||''}};
 function closeAq(){G.aq=false;world.onAqLabel=null;$('#aqlab').hidden=true;world.setMode('game');$('#aqui').hidden=true}
+const aqOpen={};
 function aqua(pg=0){closeM();G.aq=true;const all=topInv(),NP=Math.max(1,Math.ceil(all.length/24));pg=Math.min(Math.max(0,pg),NP-1);const l=all.slice(pg*24,pg*24+24);world.setMode('aqua');world.aqFish(l.map(fishOf));world.azd=0;world.azm=1;let sel=-1;
- const u=$('#aqui');u.hidden=false;u.innerHTML='';u.append(h('b','',`AKUARIUM BESAR | ${S.inv.length} ikan (24 per halaman, termahal dulu), ukuran asli sesuai penggaris (1 m)`));
- if(!l.length)u.append(h('p','','Kosong. Tekan SIMPAN saat dapat ikan agar muncul di sini.'));
- const act=h('div','btns'),chips=h('div','chips'),cb=[],cn=(x,f)=>`${x.fav?'★ ':''}${f.name}${x.mut?' ['+x.mut+']':''} ${x.len}cm`;
- const pick=i=>{sel=i;world.aqSelect(i);cb.forEach((c,k)=>c.classList.toggle('on',k===i));act.innerHTML='';const lab=$('#aqlab');
-  if(i<0){lab.hidden=true;return}const x=l[i],f=FISH.find(y=>y.id===x.id);lab.innerHTML=`<b>${f.name}</b>${x.mut?' <span class="tag" style="background:'+(MUT[x.mk||Object.keys(MUT).find(z=>MUT[z].n===x.mut)]||{c:'#888'}).c+'">'+x.mut.toUpperCase()+'</span>':''}<br><span class="tag" style="background:${RC[f.rarity]}">${f.rarity}</span> ${x.len} cm | ${x.w} kg`;
-  act.append(btn(x.fav?'★ BATAL FAVORIT':'☆ FAVORIT',()=>{x.fav=!x.fav;save();cb[i].textContent=cn(x,f);pick(i)}),btn('PAMER',()=>startFlex(x)),btn('NAIKI IKAN INI',()=>{closeAq();beginRide(x)}),btn('LEPAS PILIHAN',()=>pick(-1)));cb[i]&&cb[i].scrollIntoView&&cb[i].scrollIntoView({block:'nearest',inline:'center'})};
+ const u=$('#aqui');u.hidden=false;u.innerHTML='';
+ const head=h('b','',`AKUARIUM | ${S.inv.length} ikan | halaman ${pg+1}/${NP} (24 per halaman, tertinggi dulu) | ukuran asli sesuai penggaris (1 m)`),act=h('div','btns aqact'),list=h('div','aqlist'),foot=h('div','pfoot aqfoot'),cb=[];
+ const info=x=>`${x.mut?'MUTASI '+x.mut+' | ':''}${x.len} cm | ${x.w} kg`;
+ const draw=()=>{list.innerHTML='';cb.length=0;
+  if(!l.length){list.append(h('p','','Kosong. Tekan SIMPAN saat dapat ikan agar muncul di sini.'));return}
+  list.append(h('p','','Tap ikan di dalam akuarium atau di daftar untuk melihat nama dan ukurannya. Geser layar untuk memutar kamera.'));
+  [...RN].reverse().forEach(t=>{const ids=[];l.forEach((x,i)=>{if(x.r===t)ids.push(i)});if(!ids.length)return;const open=aqOpen[t]!==false,hd=btn(`${open?'▼':'▶'} ${t.toUpperCase()} (${ids.length})`,()=>{aqOpen[t]=!open;draw()},'sec');hd.style.background=RC[t];list.append(hd);
+   if(open)ids.forEach(i=>{const x=l[i],f=FISH.find(y=>y.id===x.id)||{name:x.id},r=h('div','row'+(sel===i?' picked':''),`<span><b>${x.fav?'★ ':''}${f.name}</b><small>${info(x)}</small></span>`),c=btn(sel===i?'DIPILIH':'LIHAT',()=>pick(sel===i?-1:i),sel===i?'on':'');cb[i]=c;r.append(c);list.append(r)})})};
+ const pick=i=>{sel=i;world.aqSelect(i);if(i>=0)aqOpen[l[i].r]=true;draw();act.innerHTML='';const lab=$('#aqlab');
+  if(i<0){lab.hidden=true;return}const x=l[i],f=FISH.find(y=>y.id===x.id);lab.innerHTML=`<b>${f.name}</b>${x.mut?' <span class=\"tag\" style=\"background:'+(MUT[x.mk||Object.keys(MUT).find(z=>MUT[z].n===x.mut)]||{c:'#888'}).c+'\">'+x.mut.toUpperCase()+'</span>':''}<br><span class=\"tag\" style=\"background:${RC[f.rarity]}\">${f.rarity}</span> ${x.len} cm | ${x.w} kg`;
+  act.append(btn(x.fav?'★ BATAL FAVORIT':'☆ FAVORIT',()=>{x.fav=!x.fav;save();pick(i)}),btn('PAMER',()=>startFlex(x)),btn('NAIKI IKAN INI',()=>{closeAq();beginRide(x)}),btn('LEPAS PILIHAN',()=>pick(-1)));
+  cb[i]&&cb[i].scrollIntoView&&cb[i].scrollIntoView({block:'nearest'})};
  world.onAqLabel=(nx,ny,vis)=>{const lab=$('#aqlab');if(sel<0||!vis){lab.hidden=true;return}lab.hidden=false;lab.style.left=(nx*100)+'%';lab.style.top=(ny*100)+'%'};
  G.aqPick=pick;
- l.forEach((x,i)=>{const f=FISH.find(y=>y.id===x.id),c=btn(cn(x,f),()=>pick(sel===i?-1:i));cb.push(c);chips.append(c)});
- const zr=h('div','btns');zr.append(btn('ZOOM +',()=>{world.azm=cl(world.azm*.8,.3,1.4)}),btn('ZOOM -',()=>{world.azm=cl(world.azm*1.25,.3,1.4)}),btn('TUTUP',closeAq));
- if(NP>1)zr.append(btn(`HALAMAN ${pg+1}/${NP}`,()=>aqua((pg+1)%NP)));
- u.append(chips,act,h('p','','Tap ikan di dalam akuarium atau di daftar untuk melihat nama dan ukurannya. Geser layar untuk memutar kamera.'),zr)}
+ foot.append(btn('ZOOM +',()=>{world.azm=cl(world.azm*.8,.3,1.4)}),btn('ZOOM -',()=>{world.azm=cl(world.azm*1.25,.3,1.4)}));
+ if(NP>1)foot.append(btn(`HAL ${pg+1}/${NP}`,()=>aqua((pg+1)%NP)));
+ foot.append(btn('TUTUP',closeAq,'back'));foot.style.gridTemplateColumns=`repeat(${foot.childElementCount},1fr)`;
+ draw();u.append(head,act,list,foot)}
 function spotMenu(){if(G.st!=='idle')return;const b=h('div'),cur=world.spot||'dermaga',L=[['dermaga','Dermaga Utama','Standar. Tempat paling aman dan nyaman.'],['kiri','Tepi Pulau Kiri','Perairan tenang: ikan menggigit sekitar 20% lebih cepat.'],['kanan','Tepi Pulau Kanan','Arus dalam: peluang ikan langka naik sekitar 18%.']];
  b.append(h('p','','Pilih tempat memancing. Karakter berjalan otomatis ke sana. Kamu juga bisa jalan sendiri pakai joystick lewat jembatan kayu.'));
  L.forEach(([k,n,d])=>{const r=h('div','row',`<span><b>${n}</b><small>${d}</small></span>`);r.append(btn(cur===k?'DI SINI':'PERGI',()=>{closeM();world.goSpot(k);say('Berjalan ke '+n+'...',2)},cur===k?'on':''));b.append(r)});b.append(btn('KEMBALI',closeM));modal('Pindah Spot',b)}
@@ -244,7 +253,7 @@ function rideMenu(){if(G.st!=='idle')return;const b=h('div'),mk=co=>{const f=fis
  b.append(h('p','','Pilih ikan dari Tas untuk ditunggangi menjelajah sungai. Ikan besar lebih gagah, ikan langka/mutasi lebih cepat. Kumpulkan mutiara dan kristal untuk koin dan XP!'));
  topInv().slice(0,40).forEach(co=>b.append(mk(co)));
  if(!S.inv.length){const L=LOCS[S.loc].n,f0=FISH.find(f=>f.rarity==='Common'&&f.hab.some(x=>x.n===L))||FISH[0];b.append(h('p','','Tas kosong. Pakai ikan pinjaman dulu, atau tangkap lalu SIMPAN ikan.'),mk({id:f0.id,w:3,len:Math.round(35*Math.cbrt(3)),mut:''}))}
- b.append(btn('KEMBALI',closeM));modal('Naik Ikan',b)}
+ b.append(btn('KEMBALI',closeM));modal('Naik Ikan',b,false,false,true)}
 function startFlex(co,back){closeM();closeAq();const f=fishOf(co);G.f=f;G.st='flex';G.ct=1;G.cdur=1;G.back=back||(()=>{reset();aqua()});world.startFlex(f,RN.indexOf(f.rarity));sfx('catch',Math.min(3,RN.indexOf(f.rarity)))}
 let pd=null;const APP=$('#app');
 APP.addEventListener('pointerdown',e=>{unlock();if(e.target.closest('input,#modal,#dock,#aqui,#flexui,#joy,#rideui'))return;pd={x:e.clientX,y:e.clientY,mv:0};if(G.st==='fight'&&G.swT<=0&&!e.target.closest('button'))tap()});
