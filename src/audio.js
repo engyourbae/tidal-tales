@@ -19,7 +19,7 @@ const bad={},SB={},AB={},TR={};let live=[];
 function ctx(){if(ac)return ac;const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ac=new C();
  const cp=ac.createDynamicsCompressor();cp.threshold.value=-18;cp.knee.value=18;cp.ratio.value=4;cp.attack.value=.003;cp.release.value=.15;
  master=ac.createGain();master.gain.value=.95;master.connect(cp);cp.connect(ac.destination);
- sfxG=ac.createGain();sfxG.connect(master);ambG=ac.createGain();ambG.connect(duckG);duckG=ac.createGain();duckG.connect(master);musG=ac.createGain();musG.gain.value=0;musG.connect(duckG);
+ duckG=ac.createGain();duckG.connect(master);sfxG=ac.createGain();sfxG.connect(master);ambG=ac.createGain();ambG.connect(duckG);musG=ac.createGain();musG.gain.value=0;musG.connect(duckG);
  reelG=ac.createGain();reelG.gain.value=0;reelG.connect(master);
  const lim=ac.createDynamicsCompressor();lim.threshold.value=-4;lim.knee.value=0;lim.ratio.value=20;lim.attack.value=.001;lim.release.value=.12;priG=ac.createGain();priG.connect(lim);lim.connect(ac.destination);return ac}
 function fetchBuf(n){return fetch(BASE+n+EXT).then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(b=>new Promise((ok,no)=>{const p=ac.decodeAudioData(b,ok,no);if(p&&p.catch)p.catch(no)}))}
@@ -36,7 +36,8 @@ function play(n,vol=1,delay=0,fadeOthers=false){const b=SB[n];if(!b)return false
  if(fadeOthers)live.forEach(o=>{try{o.g.gain.cancelScheduledValues(T);o.g.gain.setValueAtTime(o.g.gain.value,T);o.g.gain.linearRampToValueAtTime(0,T+FO);o.s.stop(T+FO+.01)}catch{}});
  if(DUCK[n]!==undefined){const dg=duckG.gain;dg.cancelScheduledValues(T);dg.setTargetAtTime(DUCK[n],T,.03);dg.setTargetAtTime(1,T+d*.85,.25)}
  s.connect(g);g.connect(pri?priG:sfxG);s.start(T);s.stop(T+d+.02);const o={s,g};live.push(o);s.onended=()=>{live=live.filter(x=>x!==o)};return true}
-export function sfx(n,a=0){if(!on.sound||!ctx())return;
+export function sfx(n,a=0){try{sfx_(n,a)}catch(e){console.warn('sfx',e)}}
+function sfx_(n,a){if(!on.sound||!ctx())return;
  if(n==='catch'){const k=CATCH[Math.max(0,Math.min(6,a))];play(k,1,0,true);return}
  if(n==='secretok'){play(SECRET_OK,1,0,true);return}
  const f=SFX[n];if(f)play(f)}
