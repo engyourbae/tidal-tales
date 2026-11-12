@@ -8,9 +8,15 @@ export class Rooms{
  constructor(w){this.w=w;this.cur=null;this.type=null;this.any={};this.root=new THREE.Group();this.root.position.set(BX,0,0);w.s.add(this.root);
   ad(this.root,bx(40,.3,24),mm('#2b3446'),0,-.15,0);ad(this.root,bx(40,14,.3),mm('#1d2740'),0,7,-7);
   [['#d1493f',-8],['#e9b52f',-4],['#3f9e6e',0],['#2f6fb0',4],['#7b4fb8',8]].forEach(([c,x])=>ad(this.root,bx(3.6,.5,.3),mm(c),x,6,-6.8));
-  const l1=new THREE.PointLight('#fff3d6',1.6,34);l1.position.set(0,7,6);const l2=new THREE.PointLight('#7fb6ff',.9,26);l2.position.set(-7,3,3);this.root.add(l1,l2)}
+  const l1=new THREE.PointLight('#fff3d6',1.6,34);l1.position.set(0,7,6);const l2=new THREE.PointLight('#7fb6ff',.9,26);l2.position.set(-7,3,3);this.root.add(l1,l2);
+  // polesan visual: lantai sedikit mengilap + debu halus melayang (hanya visual, tidak memengaruhi logika ruangan)
+  const fl=this.root.children[0];if(fl&&fl.material){fl.material.roughness=.55;fl.material.metalness=.08}
+  const N=60,pa=new Float32Array(N*3),ph=new Float32Array(N);for(let i=0;i<N;i++){pa[i*3]=(Math.random()-.5)*30;pa[i*3+1]=.5+Math.random()*8;pa[i*3+2]=(Math.random()-.5)*14;ph[i]=Math.random()*6.28}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pa.slice(),3));this.dust={g,pa,ph,N};
+  const dm=this.dustM=new THREE.Points(g,new THREE.PointsMaterial({color:'#fff3d6',size:.09,map:w.softTex||null,transparent:true,opacity:.5,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true}));dm.frustumCulled=false;this.root.add(dm)}
  show(type,d){if(this.cur){this.root.remove(this.cur);disposeFish(this.cur)}const G=this.cur=new THREE.Group();this.root.add(G);this.type=type;this.d=d||{};this.any={};this['b_'+type](G,this.d)}
- frame(dt,t){const w=this.w,c=this.cfg;if(!c)return;if(this['a_'+this.type])this['a_'+this.type](t,dt);const p=w.cam.aspect<1?c.pp:c.p;
+ frame(dt,t){const w=this.w,c=this.cfg;if(!c)return;{const D=this.dust,q=w.q?w.q.p.part:1;this.dustM.visible=q>=.9;if(this.dustM.visible){const P=D.g.attributes.position.array;for(let i=0;i<D.N;i++){P[i*3]=D.pa[i*3]+Math.sin(t*.25+D.ph[i])*.6;P[i*3+1]=D.pa[i*3+1]+Math.sin(t*.4+D.ph[i]*2)*.35;P[i*3+2]=D.pa[i*3+2]+Math.cos(t*.2+D.ph[i])*.5}D.g.attributes.position.needsUpdate=true}}
+  if(this['a_'+this.type])this['a_'+this.type](t,dt);const p=w.cam.aspect<1?c.pp:c.p;
   w.cam.position.set(BX+p[0]+Math.sin(t*.3)*.3,p[1]+Math.sin(t*.4)*.06,p[2]);w.cam.lookAt(BX+c.l[0],c.l[1],c.l[2])}
  b_shop(G,d){const gr=d.gear||{},cat=this.any.cat={};this.tab=d.tab;this.cfg={p:[0,2.8,7.2],pp:[0,3.2,10.5],l:[0,2,0]};
   const grp=(n,x,y,z)=>{const o=new THREE.Group();o.position.set(x,y,z);o.userData.y0=y;G.add(o);cat[n]=o;return o};

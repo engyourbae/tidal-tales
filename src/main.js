@@ -15,7 +15,7 @@ const bagOpen={};
 function sellBtn(label,need2,fn,guard){const b=btn(label,()=>{const m=guard&&guard();if(m){say(m,2.6);return}if(!need2||b._c){fn();return}b._c=1;b.textContent='YAKIN JUAL? PENCET LAGI';b.classList.add('warn2');setTimeout(()=>{if(b.isConnected){b._c=0;b.textContent=label;b.classList.remove('warn2')}},4000)});return b}
 const TODS=['siang','senja','malam'],SPOTN={dermaga:'Dermaga',kiri:'Pulau Kiri',kanan:'Pulau Kanan'};
 let FISH=[],GEAR={},S,tod='siang';
-const fresh=()=>({coins:50,gem:0,auto:{until:0,perm:false,on:false,act:'jual'},luck:{until:0},unl:false,xp:0,lv:1,rod:'rod_wood',reel:'reel_basic',line:'line_2kg',hook:'hook_small',own:['rod_wood','reel_basic','line_2kg','hook_small'],baits:{bait_worm:20},bait:'bait_worm',loc:0,inv:[],dex:{},stats:{caught:0,broke:0},opt:{shake:true,sound:true,fx:true,music:true,wx:'acak'}});
+const fresh=()=>({coins:50,gem:0,auto:{until:0,perm:false,on:false,act:'jual'},luck:{until:0},unl:false,xp:0,lv:1,rod:'rod_wood',reel:'reel_basic',line:'line_2kg',hook:'hook_small',own:['rod_wood','reel_basic','line_2kg','hook_small'],baits:{bait_worm:20},bait:'bait_worm',loc:0,inv:[],dex:{},stats:{caught:0,broke:0},opt:{shake:true,sound:true,fx:true,music:true,wx:'acak',gq:'auto'}});
 const load=()=>{try{const d=JSON.parse(localStorage.getItem(KEY));return d?{...fresh(),...d}:fresh()}catch{return fresh()}};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}};
 const spend=c=>S.unl||(S.coins>=c&&(S.coins-=c,true));
@@ -161,6 +161,7 @@ function dexMut(){const f0=FISH.find(f=>S.dex[f.id]);world.setRoom('dex',{fish:f
   sg.append(h('h3','',`Mutasi Khas Secret (${sc}/${ks.length})`),sc?gg:h('p','','Belum ada. Tiap ikan Secret punya 2 mutasi khas sendiri.'));secs.push(sg)}
  b.append(h('p','',`Mutasi ditemukan ${got} / ${tot}`),...secs,btn('KEMBALI',dex));modal('Indeks Mutasi',b)}
 function opts(msg=''){world.setRoom('opts',{opt:S.opt});const b=h('div');[['shake','Camera shake'],['sound','Suara'],['fx','Partikel penuh'],['music','Musik latar']].forEach(([k,l])=>{const r=h('div','row',`<span>${l}</span>`);r.append(btn(S.opt[k]?'AKTIF':'MATI',()=>{S.opt[k]=!S.opt[k];setOpt(S.opt);save();opts()},S.opt[k]?'on':''));b.append(r)});
+ {const q=world.q,r=h('div','row','<span>Kualitas grafis<small>AUTO menyesuaikan FPS perangkat. HP: AUTO maks HIGH.</small></span>');r.append(btn(q.url?q.label+' (URL)':q.label,()=>{q.cycle();S.opt.gq=q.mode;save();opts()},q.mode==='auto'?'on':''));b.append(r)}
  const WL=['acak','clear','rain','storm','meteor'],wr=h('div','row','<span>Cuaca</span>');wr.append(btn((S.opt.wx||'acak')==='acak'?'ACAK':WXN[S.opt.wx].toUpperCase(),()=>{S.opt.wx=WL[(WL.indexOf(S.opt.wx||'acak')+1)%5];save();opts()}));b.append(wr);
  const cr=h('div','row','<span>Kode redeem</span>'),inp=h('input');inp.placeholder='Masukkan kode';inp.autocapitalize='characters';
  cr.append(inp,btn('PAKAI',()=>{const c=inp.value.trim().toUpperCase();if(c==='ENGGANTENG'){S.unl=true;S.coins=Math.max(S.coins,999999999);save();opts('Kode aktif: koin dan umpan UNLIMITED, semua perlengkapan dan lokasi terbuka.')}else if(c==='ENGGACOR'){S.gacor=2;save();opts('Kode aktif: 2 tangkapan berikutnya PASTI ikan Secret dan tidak akan lepas.')}else if(c==='RESETENG'){S.unl=false;S.coins=50;S.gem=0;S.baits={bait_worm:20};save();opts('Uang direset ke 50 koin, umpan ke 20 cacing.')}else opts('Kode tidak dikenal.')}));b.append(cr);if(msg)b.append(h('p','',msg));
@@ -287,7 +288,7 @@ $('#bPhoto').onclick=()=>{const a=document.createElement('a');a.href=world.snap(
  GEAR={};csvp(gc).forEach(r=>{const o={...r};['attracts','habitat'].forEach(k=>{if(o[k]!==undefined)o[k]=(o[k]===null||o[k]==='')?[]:String(o[k]).split(';').map(x=>x.trim())});(GEAR[o.category]=GEAR[o.category]||[]).push(o)});
  MENUS=csvp(mc);AUTOS=csvp(ac);TOPUPS=csvp(tc);LOCS.length=0;csvp(lc).forEach(r=>LOCS.push({n:r.name,lv:r.unlock_level,sky:r.sky,wat:r.water,bank:r.bank}));
  setLocData(LOCS.map(l=>({sky:l.sky,bank:l.bank,wat:l.wat,name:l.n})));
- S=load();S.opt={shake:true,sound:true,fx:true,music:true,wx:'acak',...S.opt};setOpt(S.opt);
+ S=load();S.opt={shake:true,sound:true,fx:true,music:true,wx:'acak',gq:'auto',...S.opt};setOpt(S.opt);world.setQuality(S.opt.gq||'auto');
  MENUS.filter(m=>String(m.dock)==='1').sort((a,b)=>a.order-b.order).forEach(m=>$('#dock').append(lego(btn(m.label,()=>runMenu(m)),m.color)));
  world.onThunder=()=>{setTimeout(()=>sfx('thunder'),300+Math.random()*700);if(S.opt.shake)world.shake=.25};world.onMeteor=()=>{sfx('meteor');if(S.opt.shake)world.shake=Math.max(world.shake,.15)};
  $('#dock').append(lego(btn('NAIK IKAN',rideMenu),'#2bb5c9'),lego(btn('PINDAH SPOT',spotMenu),'#8a5ad6'));

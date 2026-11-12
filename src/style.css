@@ -191,3 +191,15 @@ button.back{--c:#c9473a;--d:#8a2c22;--l:#f09a8f;--t:#ffffff}
 #aqui .aqfoot{display:grid;gap:8px;padding:4px 12px 10px}
 #aqui .aqfoot button{min-width:0;padding-left:4px;padding-right:4px}
 .row.picked{outline:2px solid #ffe08a;outline-offset:-2px}
+#fpsdbg{position:fixed;left:6px;bottom:6px;z-index:99;font:700 11px/1.2 monospace;color:#9ff;background:rgba(0,0,0,.55);padding:3px 6px;border-radius:4px;pointer-events:none}
+/* ---- grade layar per waktu/cuaca (murah: hanya gradient + opacity) ---- */
+#grade{position:absolute;inset:0;pointer-events:none}
+#grade i{position:absolute;inset:0;opacity:0;transition:opacity 1.6s ease}
+#grade .gn{background:radial-gradient(ellipse at 50% 42%,rgba(20,40,110,.05) 30%,rgba(4,10,40,.5) 100%),rgba(10,20,70,.12)}
+#grade .gs{background:radial-gradient(ellipse at 50% 38%,rgba(255,170,90,.06) 30%,rgba(120,40,20,.32) 100%),rgba(255,130,50,.07)}
+#grade .gr{background:radial-gradient(ellipse at 50% 45%,transparent 40%,rgba(30,45,60,.35) 100%),rgba(90,110,130,.1)}
+#grade .gst{background:radial-gradient(ellipse at 50% 45%,transparent 30%,rgba(5,8,16,.55) 100%),rgba(15,22,40,.16)}
+#grade .gm{background:radial-gradient(ellipse at 50% 40%,rgba(255,120,40,.05) 25%,rgba(70,10,10,.4) 100%)}
+#grade[data-t=malam] .gn,#grade[data-t=senja] .gs,#grade[data-w=rain] .gr,#grade[data-w=storm] .gr,#grade[data-w=storm] .gst,#grade[data-w=meteor] .gm{opacity:1}
+#grade[data-t=none] i{opacity:0!important;transition:none}
+@media (prefers-reduced-motion:reduce){#grade i{transition:none}}
