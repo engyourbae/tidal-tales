@@ -40,6 +40,8 @@ const say=(t,s=2)=>{const m=$('#msg');m.textContent=t;m.hidden=!t;G.msgT=s};
 const ZMIN=.6,ZMAX=3.5;let zT=0;
 function setZoom(v){world.zm=cl(v,ZMIN,ZMAX);S.opt.zoom=+world.zm.toFixed(2);clearTimeout(zT);zT=setTimeout(save,400)}
 const zoomBy=k=>setZoom((world.zm||1)*k);
+// zoom kamera dipasang di sini (tanpa mengubah world.js): geser kamera maju/mundur tepat sebelum frame digambar
+{const rr=world.r,r0=rr.render.bind(rr);let ax=NaN,ay=NaN,az=NaN;rr.render=function(sc,c){try{const z=world.zm||1,s=G.st;if(z!==1&&c===world.cam&&world.mode==='game'&&s!=='catch'&&s!=='result'&&s!=='flex'){const p=c.position;if(!(p.x===ax&&p.y===ay&&p.z===az)){const R=world.rd,px=R?R.x:world.pl.position.x,py=R?p.y:world.pl.position.y+1.2,pz=R?R.z:world.pl.position.z,d=Math.hypot(p.x-px,p.y-py,p.z-pz);if(z>1&&!R)p.y+=(z-1)*.9;c.translateZ((z-1)*d);if(R&&p.y<-14.6)p.y=-14.6;ax=p.x;ay=p.y;az=p.z}}}catch(e){}return r0(sc,c)}}
 function applyUI(){$('#app').classList.toggle('clean',!!S.opt.mini);$('#minBtn').textContent=S.opt.mini?'☰':'SEMBUNYI'}
 function toggleMini(){S.opt.mini=!S.opt.mini;save();applyUI()}
 // layar tidak mati selama game dibuka (Screen Wake Lock API)
