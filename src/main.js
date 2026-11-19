@@ -15,7 +15,7 @@ const bagOpen={};
 function sellBtn(label,need2,fn,guard){const b=btn(label,()=>{const m=guard&&guard();if(m){say(m,2.6);return}if(!need2||b._c){fn();return}b._c=1;b.textContent='YAKIN JUAL? PENCET LAGI';b.classList.add('warn2');setTimeout(()=>{if(b.isConnected){b._c=0;b.textContent=label;b.classList.remove('warn2')}},4000)});return b}
 const TODS=['siang','senja','malam'],SPOTN={dermaga:'Dermaga',kiri:'Pulau Kiri',kanan:'Pulau Kanan'};
 let FISH=[],GEAR={},S,tod='siang';
-const fresh=()=>({coins:50,gem:0,auto:{until:0,perm:false,on:false,act:'jual'},luck:{until:0},unl:false,xp:0,lv:1,rod:'rod_wood',reel:'reel_basic',line:'line_2kg',hook:'hook_small',own:['rod_wood','reel_basic','line_2kg','hook_small'],baits:{bait_worm:20},bait:'bait_worm',loc:0,inv:[],dex:{},stats:{caught:0,broke:0},opt:{shake:true,sound:true,fx:true,music:true,wx:'acak',gq:'auto'}});
+const fresh=()=>({coins:50,gem:0,auto:{until:0,perm:false,on:false,act:'jual'},luck:{until:0},unl:false,xp:0,lv:1,rod:'rod_wood',reel:'reel_basic',line:'line_2kg',hook:'hook_small',own:['rod_wood','reel_basic','line_2kg','hook_small'],baits:{bait_worm:20},bait:'bait_worm',loc:0,inv:[],dex:{},stats:{caught:0,broke:0},opt:{shake:true,sound:true,fx:true,music:true,wx:'acak',gq:'auto',awake:true,mini:false,zoom:1}});
 const load=()=>{try{const d=JSON.parse(localStorage.getItem(KEY));return d?{...fresh(),...d}:fresh()}catch{return fresh()}};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}};
 const spend=c=>S.unl||(S.coins>=c&&(S.coins-=c,true));
@@ -37,6 +37,14 @@ function parseFish(txt){return Papa.parse(txt.replace(/^\uFEFF/,''),{header:true
 const G={st:'idle',pw:0,pd:1,t:0,cd:6,bt:0,bw:1,f:null,ten:0,sta:100,dist:100,over:0,surge:0,sn:2,pump:0,reel:false,time:0,bait:null,pull:20,ct:0,cdur:1,slow:0,after:null,jumper:false,fx:0,msgT:0,wx:'clear',wxT:12,prog:0,en:0,eMax:0,eSum:0,eN:0,swT:0,swMax:1,swDir:null,swM:[],grace:2.5,tapP:0,spinV:0,aq:false,back:null,lastTap:0,fr:false,omenT:0,wxBack:'clear',ft:0,omen:false,swN:0,swD:0,swLast:null,swCur:0,hi:false};
 const cv=$('#cv'),M=$('#modal'),busy=()=>!M.hidden,world=new World(cv);
 const say=(t,s=2)=>{const m=$('#msg');m.textContent=t;m.hidden=!t;G.msgT=s};
+const ZMIN=.6,ZMAX=3.5;let zT=0;
+function setZoom(v){world.zm=cl(v,ZMIN,ZMAX);S.opt.zoom=+world.zm.toFixed(2);clearTimeout(zT);zT=setTimeout(save,400)}
+const zoomBy=k=>setZoom((world.zm||1)*k);
+function applyUI(){$('#app').classList.toggle('clean',!!S.opt.mini);$('#minBtn').textContent=S.opt.mini?'☰':'SEMBUNYI'}
+function toggleMini(){S.opt.mini=!S.opt.mini;save();applyUI()}
+// layar tidak mati selama game dibuka (Screen Wake Lock API)
+let wl=null;async function wake(){try{if(!S||!('wakeLock' in navigator))return;if(S.opt.awake!==false){if(!wl&&document.visibilityState==='visible'){wl=await navigator.wakeLock.request('screen');wl.addEventListener('release',()=>{wl=null})}}else if(wl){const w=wl;wl=null;await w.release()}}catch{wl=null}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')wake()});
 const reset=()=>{G.st='idle';G.f=null;G.reel=false;G.ten=0;G.sta=100;G.dist=100;G.surge=0;G.ct=0;G.swT=0;G.swDir=null;G.prog=0;G.en=0;G.hi=false;clearOmen();leaveFight()};
 
 const addXp=n=>{S.xp+=n;let up=false;while(S.xp>=S.lv*120){S.xp-=S.lv*120;S.lv++;up=true}if(up){sfx('level');say('LEVEL NAIK: '+S.lv,2.2)}};
@@ -160,7 +168,8 @@ function dexMut(){const f0=FISH.find(f=>S.dex[f.id]);world.setRoom('dex',{fish:f
  {const ks=Object.keys(MUT).filter(k=>MUT[k].only),sg=h('div'),gg=h('div','grid');let sc=0;ks.forEach(k=>{const f=FISH.find(x=>x.id===MUT[k].only),d=f&&S.dex[f.id],ok=d&&d.muts&&d.muts.includes(MUT[k].n);tot++;if(ok){got++;sc++;const cd=h('div','card'),m=h('img');m.src=thumb(f,false,{k,...MUT[k]});cd.append(m,h('div','',`<b>${f.name}</b><br><span class=\"tag\" style=\"background:${MUT[k].c}\">${MUT[k].n.toUpperCase()}</span>`));gg.append(cd)}});
   sg.append(h('h3','',`Mutasi Khas Secret (${sc}/${ks.length})`),sc?gg:h('p','','Belum ada. Tiap ikan Secret punya 2 mutasi khas sendiri.'));secs.push(sg)}
  b.append(h('p','',`Mutasi ditemukan ${got} / ${tot}`),...secs,btn('KEMBALI',dex));modal('Indeks Mutasi',b)}
-function opts(msg=''){world.setRoom('opts',{opt:S.opt});const b=h('div');[['shake','Camera shake'],['sound','Suara'],['fx','Partikel penuh'],['music','Musik latar']].forEach(([k,l])=>{const r=h('div','row',`<span>${l}</span>`);r.append(btn(S.opt[k]?'AKTIF':'MATI',()=>{S.opt[k]=!S.opt[k];setOpt(S.opt);save();opts()},S.opt[k]?'on':''));b.append(r)});
+function opts(msg=''){world.setRoom('opts',{opt:S.opt});const b=h('div');[['shake','Camera shake'],['sound','Suara'],['fx','Partikel penuh'],['music','Musik latar'],['awake','Layar selalu hidup'],['mini','Menu minimal (layar bersih)']].forEach(([k,l])=>{const r=h('div','row',k==='awake'?`<span>${l}<small>Layar tidak mati walau tidak disentuh (selama game dibuka).</small></span>`:`<span>${l}</span>`);r.append(btn(S.opt[k]?'AKTIF':'MATI',()=>{S.opt[k]=!S.opt[k];setOpt(S.opt);save();wake();applyUI();opts()},S.opt[k]?'on':''));b.append(r)});
+ {const zr=h('div','row',`<span>Zoom kamera<small>Jarak ${Math.round((world.zm||1)*100)}% (100% = standar). Bisa juga cubit layar / scroll mouse / tombol + dan - di layar.</small></span>`),zw=h('span');zw.append(btn('ZOOM +',()=>{zoomBy(.85);opts()}),btn('ZOOM -',()=>{zoomBy(1.18);opts()}),btn('RESET',()=>{setZoom(1);opts()}));zr.append(zw);b.append(zr)}
  {const q=world.q,r=h('div','row','<span>Kualitas grafis<small>AUTO menyesuaikan FPS perangkat. HP: AUTO maks HIGH.</small></span>');r.append(btn(q.url?q.label+' (URL)':q.label,()=>{q.cycle();S.opt.gq=q.mode;save();opts()},q.mode==='auto'?'on':''));b.append(r)}
  const WL=['acak','clear','rain','storm','meteor'],wr=h('div','row','<span>Cuaca</span>');wr.append(btn((S.opt.wx||'acak')==='acak'?'ACAK':WXN[S.opt.wx].toUpperCase(),()=>{S.opt.wx=WL[(WL.indexOf(S.opt.wx||'acak')+1)%5];save();opts()}));b.append(wr);
  const cr=h('div','row','<span>Kode redeem</span>'),inp=h('input');inp.placeholder='Masukkan kode';inp.autocapitalize='characters';
@@ -205,7 +214,7 @@ function hud(){
  const sw=$('#swipe');sw.hidden=!(ft&&G.swT>0);if(!sw.hidden){sw.dataset.d=G.swDir;$('#swt').textContent={L:'GESER KIRI',R:'GESER KANAN',U:'GESER ATAS',D:'GESER BAWAH'}[G.swDir]+' '+Math.min(G.swN,G.swD+1)+'/'+G.swN;$('#swb').style.width=(G.swT/G.swMax*100)+'%'}
  $('#hud').hidden=!!G.aq||s==='flex'||s==='ride'||busy();
  {const rd=world.rd,ride=s==='ride'&&!busy();$('#joy').hidden=!((s==='idle'||ride)&&!busy()&&!G.aq);$('#rideui').hidden=!ride;
-  if(ride&&rd){$('#rst').style.width=rd.stam+'%';$('#rst').className=rd.exh?'bad':rd.stam<30?'warn':'sta';{const o=$('#ro2');if(o){lazyW(o);lazyC(o);lazyT($('#rolab'));o.style.width=rd.o2+'%';o.className=rd.o2<25?'bad':rd.o2<50?'warn':'sta';$('#rolab').textContent=`OKSIGEN | KEDALAMAN ${rd.dep.toFixed(1)} m`}}$('#rinfo').textContent=`KOIN +${RS.coins} | MUTIARA ${RS.pearls} | KRISTAL +${RS.gems} | XP +${RS.xp} | JARAK ${Math.round(RS.dist*.6)} m`;$('#rcombo').textContent=RS.combo>=3?`COMBO x${Math.min(5,1+Math.floor(RS.combo/3))}  (${RS.combo})`:'';$('#bBoost').classList.toggle('on',!!rd.boost);$('#rname').textContent=`${rd.f.name} | ${Math.round(rd.sp||0)} / ${rd.spd.toFixed(1)} kec`}}$('#dock').hidden=!(s==='idle'&&!busy()&&!G.aq);$('#flexui').hidden=s!=='flex'}
+  if(ride&&rd){$('#rst').style.width=rd.stam+'%';$('#rst').className=rd.exh?'bad':rd.stam<30?'warn':'sta';{const o=$('#ro2');if(o){lazyW(o);lazyC(o);lazyT($('#rolab'));o.style.width=rd.o2+'%';o.className=rd.o2<25?'bad':rd.o2<50?'warn':'sta';$('#rolab').textContent=`OKSIGEN | KEDALAMAN ${rd.dep.toFixed(1)} m`}}$('#rinfo').textContent=`KOIN +${RS.coins} | MUTIARA ${RS.pearls} | KRISTAL +${RS.gems} | XP +${RS.xp} | JARAK ${Math.round(RS.dist*.6)} m`;$('#rcombo').textContent=RS.combo>=3?`COMBO x${Math.min(5,1+Math.floor(RS.combo/3))}  (${RS.combo})`:'';$('#bBoost').classList.toggle('on',!!rd.boost);$('#rname').textContent=`${rd.f.name} | ${Math.round(rd.sp||0)} / ${rd.spd.toFixed(1)} kec`}}$('#dock').hidden=!(s==='idle'&&!busy()&&!G.aq);$('#flexui').hidden=s!=='flex';$('#zoomui').hidden=busy()||!!G.aq||s==='flex'||s==='catch'||s==='result'}
 
 function pushInput(dt){let x=JOY.x,y=JOY.y;if(!JOY.on){x=(KEYS.ArrowRight||KEYS.KeyD?1:0)-(KEYS.ArrowLeft||KEYS.KeyA?1:0);y=(KEYS.ArrowDown||KEYS.KeyS?1:0)-(KEYS.ArrowUp||KEYS.KeyW?1:0)}
  world.inp.x=x;world.inp.y=y;world.inp.boost=!!(KEYS.ShiftLeft||KEYS.ShiftRight||(G.st==='ride'&&KEYS.Space)||G.boostBtn);world.inp.dive=G.st==='ride'?(G.dive||((KEYS.KeyQ?1:0)-(KEYS.KeyE?1:0))):0;
@@ -217,9 +226,9 @@ let last=0,errT=0,dts=.016;function loop(ts){const dt=Math.min(.05,(ts-last)/100
  requestAnimationFrame(loop)}
 const press=(e,fn)=>{e.addEventListener('pointerdown',ev=>{ev.preventDefault();fn(true)});['pointerup','pointerleave','pointercancel'].forEach(n=>e.addEventListener(n,()=>fn(false)))};
 press($('#bCast'),d=>d?startCharge():doCast());
-$('#bStrike').onclick=strike;$('#menuBtn').onclick=()=>{if(G.st==='idle')home()};
+$('#bStrike').onclick=strike;$('#menuBtn').onclick=()=>{if(G.st==='idle')home()};$('#minBtn').onclick=toggleMini;$('#zIn').onclick=()=>zoomBy(.85);$('#zOut').onclick=()=>zoomBy(1.18);
 addEventListener('keydown',e=>{KEYS[e.code]=true;if(e.code==='ShiftLeft'||e.code==='ShiftRight'||/^(Arrow|Key[WASD])/.test(e.code)&&(G.st==='idle'||G.st==='ride'))e.preventDefault()});addEventListener('keyup',e=>{KEYS[e.code]=false});addEventListener('blur',()=>{for(const k in KEYS)KEYS[k]=false});
-addEventListener('keydown',e=>{unlock();if(e.repeat||busy())return;if(e.code==='Space'){e.preventDefault();G.st==='idle'?startCharge():G.st==='fight'?tap():strike()}const a={ArrowLeft:'L',ArrowRight:'R',ArrowUp:'U',ArrowDown:'D'}[e.code];if(a){e.preventDefault();swipe(a)}});
+addEventListener('keydown',e=>{unlock();wake();if(!busy()){if(e.code==='Equal'||e.code==='NumpadAdd')zoomBy(.92);else if(e.code==='Minus'||e.code==='NumpadSubtract')zoomBy(1.09);else if(e.code==='KeyH'&&!e.repeat)toggleMini()}if(e.repeat||busy())return;if(e.code==='Space'){e.preventDefault();G.st==='idle'?startCharge():G.st==='fight'?tap():strike()}const a={ArrowLeft:'L',ArrowRight:'R',ArrowUp:'U',ArrowDown:'D'}[e.code];if(a){e.preventDefault();swipe(a)}});
 addEventListener('keyup',e=>{if(e.code==='Space'){G.st==='charge'?doCast():G.reel=false}});
 
 const csvp=t=>Papa.parse(t.replace(/^\uFEFF/,''),{header:true,dynamicTyping:true,skipEmptyLines:true}).data;
@@ -260,14 +269,19 @@ function rideMenu(){if(G.st!=='idle')return;const b=h('div'),mk=co=>{const f=fis
 function startFlex(co,back){closeM();closeAq();const f=fishOf(co);G.f=f;G.st='flex';G.ct=1;G.cdur=1;G.back=back||(()=>{reset();aqua()});world.startFlex(f,RN.indexOf(f.rarity));sfx('catch',Math.min(3,RN.indexOf(f.rarity)))}
 let pd=null;const APP=$('#app');
 addEventListener('pointerdown',e=>{const b=e.target&&e.target.closest&&e.target.closest('button');if(b&&!b.closest('#hud,#rideui,#joy'))sfx('ui')},true);
-APP.addEventListener('pointerdown',e=>{unlock();if(e.target.closest('input,#modal,#dock,#aqui,#flexui,#joy,#rideui'))return;pd={x:e.clientX,y:e.clientY,mv:0};if(G.st==='fight'&&G.swT<=0&&!e.target.closest('button'))tap()});
-APP.addEventListener('pointermove',e=>{if(!pd)return;const dx=e.clientX-pd.x,dy=e.clientY-pd.y;pd.mv=Math.max(pd.mv||0,Math.hypot(dx,dy));
+const PT=new Map();let pinch=null;
+APP.addEventListener('pointerdown',e=>{unlock();wake();if(e.target.closest('input,#modal,#dock,#aqui,#flexui,#joy,#rideui,#zoomui,#top'))return;PT.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(PT.size===2&&G.st!=='fight'&&world.mode==='game'){const[a,b]=[...PT.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1,z:world.zm||1};pd=null;return}
+ pd={x:e.clientX,y:e.clientY,mv:0};if(G.st==='fight'&&G.swT<=0&&!e.target.closest('button'))tap()});
+APP.addEventListener('pointermove',e=>{if(PT.has(e.pointerId))PT.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pinch&&PT.size>=2){const[a,b]=[...PT.values()],d=Math.hypot(a.x-b.x,a.y-b.y)||1;setZoom(pinch.z*pinch.d/d);return}
+ if(!pd)return;const dx=e.clientX-pd.x,dy=e.clientY-pd.y;pd.mv=Math.max(pd.mv||0,Math.hypot(dx,dy));
  if(G.st==='fight'&&G.swT>0){if(Math.hypot(dx,dy)>50){swipe(Math.abs(dx)>Math.abs(dy)?(dx<0?'L':'R'):(dy<0?'U':'D'));pd=null}}
  else if(G.st==='flex')world.fyaw=(world.fyaw||0)+(e.movementX||0)*.012;
  else if(world.mode==='aqua')world.azd=cl((world.azd||0)+(e.movementX||0)*.006,-1.2,1.2)});
-APP.addEventListener('pointerup',e=>{if(pd&&world.mode==='aqua'&&G.aq&&(pd.mv||0)<8&&G.aqPick){const r=cv.getBoundingClientRect(),i=world.aqPick((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height*2-1));if(i>=0)G.aqPick(i)}pd=null});
-APP.addEventListener('pointercancel',()=>{pd=null});
-APP.addEventListener('wheel',e=>{if(world.mode==='aqua')world.azm=cl((world.azm||1)*(1+e.deltaY*.0012),.3,1.4)},{passive:true});
+APP.addEventListener('pointerup',e=>{PT.delete(e.pointerId);if(PT.size<2)pinch=null;if(pd&&world.mode==='aqua'&&G.aq&&(pd.mv||0)<8&&G.aqPick){const r=cv.getBoundingClientRect(),i=world.aqPick((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height*2-1));if(i>=0)G.aqPick(i)}pd=null});
+APP.addEventListener('pointercancel',e=>{PT.delete(e.pointerId);if(PT.size<2)pinch=null;pd=null});
+APP.addEventListener('wheel',e=>{if(world.mode==='aqua')world.azm=cl((world.azm||1)*(1+e.deltaY*.0012),.3,1.4);else if(world.mode==='game'&&!busy())setZoom((world.zm||1)*(1+e.deltaY*.0012))},{passive:true});
 {const J=$('#joy'),K=$('#joyk'),setJ=e=>{const r=J.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,R=r.width/2-8;let dx=e.clientX-cx,dy=e.clientY-cy;const d=Math.hypot(dx,dy);if(d>R){dx*=R/d;dy*=R/d}JOY.x=dx/R;JOY.y=dy/R;K.style.transform=`translate(${dx}px,${dy}px)`};
  J.addEventListener('pointerdown',e=>{e.preventDefault();unlock();J.setPointerCapture(e.pointerId);JOY.on=true;setJ(e)});J.addEventListener('pointermove',e=>{if(JOY.on)setJ(e)});
  const up=()=>{JOY.on=false;JOY.x=JOY.y=0;K.style.transform='translate(0,0)'};['pointerup','pointercancel','lostpointercapture'].forEach(n=>J.addEventListener(n,up))}
@@ -288,7 +302,7 @@ $('#bPhoto').onclick=()=>{const a=document.createElement('a');a.href=world.snap(
  GEAR={};csvp(gc).forEach(r=>{const o={...r};['attracts','habitat'].forEach(k=>{if(o[k]!==undefined)o[k]=(o[k]===null||o[k]==='')?[]:String(o[k]).split(';').map(x=>x.trim())});(GEAR[o.category]=GEAR[o.category]||[]).push(o)});
  MENUS=csvp(mc);AUTOS=csvp(ac);TOPUPS=csvp(tc);LOCS.length=0;csvp(lc).forEach(r=>LOCS.push({n:r.name,lv:r.unlock_level,sky:r.sky,wat:r.water,bank:r.bank}));
  setLocData(LOCS.map(l=>({sky:l.sky,bank:l.bank,wat:l.wat,name:l.n})));
- S=load();S.opt={shake:true,sound:true,fx:true,music:true,wx:'acak',gq:'auto',...S.opt};setOpt(S.opt);world.setQuality(S.opt.gq||'auto');
+ S=load();S.opt={shake:true,sound:true,fx:true,music:true,wx:'acak',gq:'auto',awake:true,mini:false,zoom:1,...S.opt};setOpt(S.opt);world.setQuality(S.opt.gq||'auto');world.zm=cl(+S.opt.zoom||1,ZMIN,ZMAX);applyUI();wake();
  MENUS.filter(m=>String(m.dock)==='1').sort((a,b)=>a.order-b.order).forEach(m=>$('#dock').append(lego(btn(m.label,()=>runMenu(m)),m.color)));
  world.onThunder=()=>{setTimeout(()=>sfx('thunder'),300+Math.random()*700);if(S.opt.shake)world.shake=.25};world.onMeteor=()=>{sfx('meteor');if(S.opt.shake)world.shake=Math.max(world.shake,.15)};
  $('#dock').append(lego(btn('NAIK IKAN',rideMenu),'#2bb5c9'),lego(btn('PINDAH SPOT',spotMenu),'#8a5ad6'));
