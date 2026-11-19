@@ -530,7 +530,6 @@ export class World{
   if(st==='fight'&&this.fm){look.set(this.pl.position.x+(this.fm.position.x-this.pl.position.x)*.4,.2,(this.pl.position.z+this.fm.position.z)/2-2);base.z+=Math.min(2.6,this.fL*.45);base.y+=Math.min(1.1,this.fL*.14);base.x+=Math.sin(t*.45)*.22}
   {const ox=this.pl.position.x,oz=this.pl.position.z-PZ;base.x+=ox;base.z+=oz;if(st!=='fight'){look.x+=ox;look.z+=oz}}
   if(this.rd){this.bob.visible=false;this.line.visible=false;this.rideCam(base,look,dt)}
-  {const z=this.zm||1;if(z!==1){const R=this.rd,px=R?R.x:this.pl.position.x,py=R?look.y:this.pl.position.y+1.2,pz=R?R.z:this.pl.position.z;base.x=px+(base.x-px)*z;base.y=py+(base.y-py)*z+(!R&&z>1?(z-1)*.9:0);base.z=pz+(base.z-pz)*z;if(R)base.y=Math.max(-14.6,base.y)}} // ZOOM kamera: z>1 menjauh dari karakter, z<1 mendekat
   if(holdMode&&this.fm){const L=this.fL,tf=Math.tan((por?74:52)*Math.PI/360),d=Math.max(3.4,L*1.35*1.15/(2*tf*this.cam.aspect),Math.max(2.4,L*.6+1.7)/(2*tf)),p=st==='catch'?Math.min(1,G.ct/G.cdur):1,hi=!!this.hiF,th=hi?[.22,.45,.7]:[.4],si=p>=1?th.length:th.filter(x=>p>x).length,hp=this.hp||V(0,1,PZ);
    if(hi&&st==='catch'&&p<1){const F=this.F||V(0,1.2,PZ),c0=this.cs,cs=p<.14?0:p<.36?1:p<.64?2:3,pl=this.pl.position;
     if(cs===0){base.set(c0.x+2.2+L*.4,.5,c0.z+3.2+L*.5);look.set(hp.x,Math.max(.6,hp.y*.6),hp.z);this.fovC=36;this.rollC=-.05;this.camK=12}
@@ -583,4 +582,9 @@ export class World{
    if(k>.01){const fl=this.flash||0,cB=this._ocB||(this._ocB=C('#1a1420')),cF=this._ocF||(this._ocF=C('#ffffff'));cF.set(this.flashCol||'#ffffff');
     for(const m of this.ocs){const u=m.userData;m.position.x+=dt*u.s;if(m.position.x>85)m.position.x=-85;m.material.opacity=k*.82*u.o;m.material.color.copy(cB).lerp(cF,Math.min(1,fl*.55))}
     for(const m of this.mss){const u=m.userData;m.position.x=u.x0+Math.sin(t*u.s*.4+u.ph)*3;m.material.opacity=k*.2*u.o;m.material.color.copy(cB).lerp(cF,Math.min(1,fl*.5))}
-    this.oLight.material.color.set(this.omenCol||'#ff4060');const tf=this.fm&&G.f?this.fm.position:null;this.oLight.visible=!!tf;if(tf){this.oLight.position.set(tf.x,tf.y+.3,tf.z);const gs=(4+(this.fL||1)*1.6)*(1+.12*Math.sin(t*3.1));this.oLight.scale.set(gs,gs,1);this.oLight.material.opacity=k*.55*(.8+.2*Math.sin(t*3.1))}}else this.oLight.visible=f
+    this.oLight.material.color.set(this.omenCol||'#ff4060');const tf=this.fm&&G.f?this.fm.position:null;this.oLight.visible=!!tf;if(tf){this.oLight.position.set(tf.x,tf.y+.3,tf.z);const gs=(4+(this.fL||1)*1.6)*(1+.12*Math.sin(t*3.1));this.oLight.scale.set(gs,gs,1);this.oLight.material.opacity=k*.55*(.8+.2*Math.sin(t*3.1))}}else this.oLight.visible=false}
+  this.r.render(this.s,this.cam)}
+}
+
+export const rideSpeed=f=>cl(4.2+RN.indexOf(f.rarity)*.6+(f.mut?1.6:0)-Math.min(1.4,Math.log10(1+f.weight)*.7),3,9.5);
+export function setLocData(a){SKY.length=0;WAT.length=0;NAMES.length=0;a.forEach(l=>{SKY.push([l.sky,l.bank]);WAT.push(l.wat);NAMES.push(l.name)})}
