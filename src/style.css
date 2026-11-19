@@ -203,3 +203,14 @@ button.back{--c:#c9473a;--d:#8a2c22;--l:#f09a8f;--t:#ffffff}
 #grade[data-t=malam] .gn,#grade[data-t=senja] .gs,#grade[data-w=rain] .gr,#grade[data-w=storm] .gr,#grade[data-w=storm] .gst,#grade[data-w=meteor] .gm{opacity:1}
 #grade[data-t=none] i{opacity:0!important;transition:none}
 @media (prefers-reduced-motion:reduce){#grade i{transition:none}}
+
+/* ===== menu minimal (layar bersih) + tombol zoom kamera ===== */
+#minBtn{--c:#7d8996;--d:#4d5864;--l:#b9c3ce;padding:9px 11px 7px;font-size:11px}
+#zoomui{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:6px}
+#zoomui[hidden]{display:none}
+#zoomui button{width:46px;height:46px;padding:0;font-size:24px;line-height:1;margin-top:7px;--c:#2f6fb0}
+#app.clean #top span,#app.clean #menuBtn,#app.clean #dock,#app.clean #zoomui{display:none!important}
+#app.clean #top{justify-content:flex-end;pointer-events:none}
+#app.clean #minBtn{pointer-events:auto;opacity:.45;padding:7px 10px 5px;font-size:13px;margin-left:0}
+#app.clean #minBtn:active{opacity:1}
+@media (orientation:portrait){#zoomui{top:40%}}
