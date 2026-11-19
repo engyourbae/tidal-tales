@@ -214,3 +214,22 @@ button.back{--c:#c9473a;--d:#8a2c22;--l:#f09a8f;--t:#ffffff}
 #app.clean #minBtn{pointer-events:auto;opacity:.45;padding:7px 10px 5px;font-size:13px;margin-left:0}
 #app.clean #minBtn:active{opacity:1}
 @media (orientation:portrait){#zoomui{top:40%}}
+
+/* ===== HUD atas rapi: ikon koin/kristal dari public/data/icons.csv, tidak terpotong ===== */
+:root{--ic-coin:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='17' r='13' fill='%239a7314'/%3E%3Ccircle cx='16' cy='15' r='13' fill='%23ffd23f'/%3E%3Ccircle cx='16' cy='15' r='9' fill='none' stroke='%23e9a23b' stroke-width='2.5'/%3E%3Cpath d='M16 9v12M12.5 12.5h5a2 2 0 010 4h-5' stroke='%239a7314' stroke-width='2.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");--ic-gem:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M8 5h16l6 8-14 17L2 13z' fill='%23177686'/%3E%3Cpath d='M8 4h16l6 8-14 16L2 12z' fill='%232bd4ea'/%3E%3Cpath d='M2 12h28M11 12l5-8 5 8-5 16z' fill='none' stroke='%23d9fbff' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E");--ic-lvl:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2l4.2 9.2 10 1.1-7.4 6.8 2.1 9.9L16 23.8 7.1 29l2.1-9.9L1.8 12.3l10-1.1z' fill='%23ffe08a' stroke='%239a7314' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E");--ic-loc:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2a9 9 0 019 9c0 7-9 19-9 19S7 18 7 11a9 9 0 019-9z' fill='%23ff7a6b' stroke='%238a2a23' stroke-width='2'/%3E%3Ccircle cx='16' cy='11' r='3.5' fill='%23fff'/%3E%3C/svg%3E")}
+#top{flex-wrap:wrap;gap:6px;row-gap:4px;top:max(8px,env(safe-area-inset-top));align-items:center}
+#top>*{min-width:0;max-width:100%}
+#top #coins,#top #gems,#top #lvl,#top #loc{display:inline-flex;align-items:center;white-space:nowrap;border:0;border-radius:6px;color:#fff;font-weight:800;font-size:12px;padding:6px 9px;line-height:1.2}
+#top #coins{background:#153b78;box-shadow:inset 2px 2px 0 #3f78c8,inset -2px -3px 0 #0d2a57,0 3px 0 #0d2a57}
+#top #gems{background:#153b78;box-shadow:inset 2px 2px 0 #3f78c8,inset -2px -3px 0 #0d2a57,0 3px 0 #0d2a57}
+#top #lvl{background:#3f9e6e;box-shadow:inset 3px 3px 0 #8ee0b4,inset -2px -3px 0 #236345,0 3px 0 #236345}
+#top #loc{order:10;flex:1 0 100%;white-space:normal;background:#0f2a50d9;box-shadow:none;font-size:11px;font-weight:700;padding:5px 9px;line-height:1.3}
+#coins::before,#gems::before,#lvl::before,#loc::before{content:"";flex:none;width:18px;height:18px;margin-right:5px;background:center/contain no-repeat}
+#coins::before{background-image:var(--ic-coin)}#gems::before{background-image:var(--ic-gem)}#lvl::before{background-image:var(--ic-lvl)}#loc::before{background-image:var(--ic-loc);width:14px;height:14px}
+#menuBtn{margin-left:auto}
+#minBtn{padding:9px 10px 7px;font-size:11px}
+#top button{white-space:nowrap}
+#dock{top:104px}#dock button{white-space:normal;line-height:1.05;font-size:10px}
+#rtop{top:104px}
+@media (max-width:380px){#top #coins,#top #gems,#top #lvl{font-size:11px;padding:6px 7px}#coins::before,#gems::before,#lvl::before{width:15px;height:15px;margin-right:3px}}
+#app.clean #top #loc{display:none!important}
