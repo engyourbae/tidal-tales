@@ -2,9 +2,9 @@
 // Semua efek di-decode di awal lalu dimainkan dengan fade masuk/keluar sangat cepat (anti klik, tanpa jeda).
 let ac,master,sfxG,ambG,musG,reelG,duckG,priG,started=false,scene='game',mood='clear',tod='siang',depth=0,curKey=null,on={sound:true,music:true};
 const BASE=((import.meta.env&&import.meta.env.BASE_URL)||'/')+'audio/',EXT='.mp3';
-const VOL={music:.6,amb:.5,sfx:1,reel:.4};
+const VOL={music:.6,amb:.6,sfx:1,reel:.45};
 // Level target suara momen (RMS, linear). Musik utama (main) sekitar -21 dB; efek dibuat jelas terdengar, sedikit di bawah/setara musik (-20/-22 dB), semuanya diratakan.
-const RT_PRI=.095,RT_SFX=.08;
+const RT_PRI=.105,RT_SFX=.1,LOUD=1.3; // LOUD: momen langka (legend bermutasi, mythic, secret) sedikit di atas musik utama
 const FI=.012,FO=.06;            // fade masuk / keluar efek (detik)
 const XF=.18;                    // crossfade musik & ambience (detik): cepat, tidak ada jeda
 // nama efek di kode -> nama file persis di public/audio
@@ -13,7 +13,7 @@ const CATCH=['catch-cammon-rare','catch-cammon-rare','catch-cammon-rare','catch-
 const SECRET_OK='secret-berhasil-dapat';
 // suara penting (catch & secret): dinormalkan ke puncak penuh lalu dikuatkan, lewat bus sendiri + limiter => lantang
 const PRI={'catch-cammon-rare':.9,'catch-epic':1,'catch-legend':1.05,'catch-mytic':1.1,'catch-secret':1.15,[SECRET_OK]:1.1},PK={};
-const SG={thunder:1,'meteor-jatuh':1};
+const SG={thunder:1,'meteor-jatuh':1,splash:.4}; // splash (pelampung nyemplung) dikecilkan
 const DUCK={}; // dimatikan: musik utama TIDAK PERNAH dikecilkan/dipotong oleh suara momen
 const MUSIC=['main','rain-music','storm','meteor','omen','fight','ride','aquarium'];
 const AMB=['waves','rain','wind','night','under'];
@@ -39,10 +39,10 @@ function play(n,vol=1,delay=0,fadeOthers=false){const b=SB[n];if(!b)return false
  if(fadeOthers)live.forEach(o=>{try{o.g.gain.cancelScheduledValues(T);o.g.gain.setValueAtTime(o.g.gain.value,T);o.g.gain.linearRampToValueAtTime(0,T+FO);o.s.stop(T+FO+.01)}catch{}});
  if(DUCK[n]!==undefined){const dg=duckG.gain;dg.cancelScheduledValues(T);dg.setTargetAtTime(DUCK[n],T,.03);dg.setTargetAtTime(1,T+d*.85,.25)}
  s.connect(g);g.connect(pri?priG:sfxG);s.start(T);s.stop(T+d+.02);const o={s,g};live.push(o);s.onended=()=>{live=live.filter(x=>x!==o)};return true}
-export function sfx(n,a=0){try{sfx_(n,a)}catch(e){console.warn('sfx',e)}}
-function sfx_(n,a){if(!on.sound||!ctx())return;
- if(n==='catch'){const k=CATCH[Math.max(0,Math.min(6,a))];play(k,1,0,true);return}
- if(n==='secretok'){play(SECRET_OK,1,0,true);return}
+export function sfx(n,a=0,mut=false){try{sfx_(n,a,mut)}catch(e){console.warn('sfx',e)}}
+function sfx_(n,a,mut){if(!on.sound||!ctx())return;
+ if(n==='catch'){const ix=Math.max(0,Math.min(6,a)),k=CATCH[ix],loud=ix>=5||(ix===4&&mut);play(k,loud?LOUD:1,0,true);return}
+ if(n==='secretok'){play(SECRET_OK,LOUD,0,true);return}
  const f=SFX[n];if(f)play(f)}
 function applyVol(){if(!started)return;const T=ac.currentTime;
  for(const k in TR)TR[k].g.gain.setTargetAtTime(TR[k].k===curKey&&on.music?1:0,T,XF);
