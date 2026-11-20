@@ -128,7 +128,7 @@ function update(dt){
  if(s==='charge'){G.pw+=G.pd*110*dt;if(G.pw>=100||G.pw<=0){G.pd*=-1;G.pw=cl(G.pw,0,100)}}
  else if(s==='cast'){G.t+=dt;if(G.t>=.7){G.st='wait';G.t=0;G.bt=rnd(2,6)*(G.bait?.7:1)*({rain:.85,storm:.7,meteor:.8}[G.wx]||1)*(world.spot==='kiri'?.8:1);world.splash(G.cd,16);world.ring(G.cd,'#dfeaf2',2.2);sfx('splash')}}
  else if(s==='wait'){G.t+=dt;if(Math.floor(G.t*.9)!==Math.floor((G.t-dt)*.9))world.ring(G.cd,'#dfeaf2',.9);
-  if(G.t>=G.bt){G.st='bite';G.t=0;G.bw=1.1+R().control*.012;G.f=pick();for(let i=0;i<3;i++)setTimeout(()=>world.ring(G.cd,'#ffffff',1.6),i*180);sfx('catch',Math.max(0,RN.indexOf(G.f.rarity)));say('IKAN MENGGIGIT! TEKAN STRIKE',G.bw)}}
+  if(G.t>=G.bt){G.st='bite';G.t=0;G.bw=1.1+R().control*.012;G.f=pick();for(let i=0;i<3;i++)setTimeout(()=>world.ring(G.cd,'#ffffff',1.6),i*180);sfx('catch',Math.max(0,RN.indexOf(G.f.rarity)),!!G.f.mut);say('IKAN MENGGIGIT! TEKAN STRIKE',G.bw)}}
  else if(s==='bite'){G.t+=dt;if(G.t>G.bw){say('Terlambat. Ikan pergi.');sfx('miss');reset()}}
  else if(s==='fight')fight(dt);
  else if(s==='catch'){G.ct+=dt;if(G.ct>=G.cdur){G.st='result';G.after()}}
