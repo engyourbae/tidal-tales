@@ -12,7 +12,7 @@ const SFX={cast:'cast',splash:'splash',hook:null,ok:'ok',fail:'fail',miss:'miss'
 const CATCH=['catch-cammon-rare','catch-cammon-rare','catch-cammon-rare','catch-epic','catch-legend','catch-mytic','catch-secret'];
 const SECRET_OK='secret-berhasil-dapat';
 // suara penting (catch & secret): dinormalkan ke puncak penuh lalu dikuatkan, lewat bus sendiri + limiter => lantang
-const PRI={'catch-cammon-rare':.95,'catch-epic':1,'catch-legend':1.08,'catch-mytic':1.18,'catch-secret':1.35,[SECRET_OK]:1.35},PK={},PM={};
+const PRI={'catch-cammon-rare':.95,'catch-epic':1,'catch-legend':1.08,'catch-mytic':1.18,'catch-secret':1.25,[SECRET_OK]:1.25},PK={},PM={},PEAKMODE=new Set(['catch-secret','secret-berhasil-dapat']); // suara secret memakai normalisasi puncak seperti aslinya (karakter suara tidak berubah)
 const SG={thunder:1,'meteor-jatuh':1,splash:.4}; // splash (pelampung nyemplung) dikecilkan
 const DUCK={}; // dimatikan: musik utama TIDAK PERNAH dikecilkan/dipotong oleh suara momen
 const MUSIC=['main','rain-music','storm','meteor','omen','fight','ride','aquarium'];
@@ -28,13 +28,13 @@ function fetchBuf(n){return fetch(BASE+n+EXT).then(r=>{if(!r.ok)throw 0;return r
 function loadAssets(){
  const sfxNames=[...new Set([...Object.values(SFX).filter(Boolean),...CATCH,SECRET_OK])];
  sfxNames.forEach(n=>fetchBuf(n).then(b=>{let m=0,ss=0,cnt=0;for(let c=0;c<b.numberOfChannels;c++){const d=b.getChannelData(c);for(let i=0;i<d.length;i++){const x=d[i],a=Math.abs(x);if(a>m)m=a;ss+=x*x}cnt+=d.length}
-  const rms=Math.sqrt(ss/Math.max(1,cnt));PM[n]=Math.max(m,.02);PK[n]=Math.min(20,.98/Math.max(m,.02),(PRI[n]!==undefined?RT_PRI:RT_SFX)/Math.max(rms,.003));SB[n]=b}).catch(()=>{}));
+  const rms=Math.sqrt(ss/Math.max(1,cnt));PM[n]=Math.max(m,.02);PK[n]=PEAKMODE.has(n)?Math.min(20,.98/Math.max(m,.02)):Math.min(20,.98/Math.max(m,.02),(PRI[n]!==undefined?RT_PRI:RT_SFX)/Math.max(rms,.003));SB[n]=b}).catch(()=>{}));
  // ambience + suara reel (loop) via buffer agar mulus
  const loop=(n,dest,store)=>fetchBuf(n).then(b=>{const s=ac.createBufferSource(),g=ac.createGain();s.buffer=b;s.loop=true;g.gain.value=0;s.connect(g);g.connect(dest);s.start();store[n]=g;applyVol()}).catch(()=>{});
  setTimeout(()=>{AMB.forEach(n=>loop(n,ambG,AB));loop('fishing-reel',reelG,AB)},500)}
 // efek: masuk cepat, keluar cepat. Efek lama yang masih bunyi lain ikut di-fade supaya tidak numpuk/ada jeda
 function play(n,vol=1,delay=0,fadeOthers=false){const b=SB[n];if(!b)return false;const T=ac.currentTime+delay,s=ac.createBufferSource(),g=ac.createGain(),d=b.duration;
- s.buffer=b;const pri=PRI[n]!==undefined;let v=vol*(PK[n]||1)*(pri?PRI[n]:(SG[n]??1))*(pri?1:VOL.sfx);if(pri)v=Math.min(v,1.15/PM[n]); // batas puncak: keras tapi tidak pecahg.gain.setValueAtTime(0,T);g.gain.linearRampToValueAtTime(v,T+FI);
+ s.buffer=b;const pri=PRI[n]!==undefined;let v=vol*(PK[n]||1)*(pri?PRI[n]:(SG[n]??1))*(pri?1:VOL.sfx);if(pri&&!PEAKMODE.has(n))v=Math.min(v,1.15/PM[n]); // batas puncak: keras tapi tidak pecahg.gain.setValueAtTime(0,T);g.gain.linearRampToValueAtTime(v,T+FI);
  const fo=Math.min(FO,d*.3);g.gain.setValueAtTime(v,Math.max(T+FI,T+d-fo));g.gain.linearRampToValueAtTime(0,T+d);
  if(fadeOthers)live.forEach(o=>{try{o.g.gain.cancelScheduledValues(T);o.g.gain.setValueAtTime(o.g.gain.value,T);o.g.gain.linearRampToValueAtTime(0,T+FO);o.s.stop(T+FO+.01)}catch{}});
  if(DUCK[n]!==undefined){const dg=duckG.gain;dg.cancelScheduledValues(T);dg.setTargetAtTime(DUCK[n],T,.03);dg.setTargetAtTime(1,T+d*.85,.25)}
