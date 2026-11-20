@@ -12,7 +12,7 @@ const SFX={cast:'cast',splash:'splash',hook:null,ok:'ok',fail:'fail',miss:'miss'
 const CATCH=['catch-cammon-rare','catch-cammon-rare','catch-cammon-rare','catch-epic','catch-legend','catch-mytic','catch-secret'];
 const SECRET_OK='secret-berhasil-dapat';
 // suara penting (catch & secret): dinormalkan ke puncak penuh lalu dikuatkan, lewat bus sendiri + limiter => lantang
-const PRI={'catch-cammon-rare':.95,'catch-epic':1,'catch-legend':1.08,'catch-mytic':1.18,'catch-secret':1.25,[SECRET_OK]:1.25},PK={},PM={},PEAKMODE=new Set(['catch-secret','secret-berhasil-dapat']); // suara secret memakai normalisasi puncak seperti aslinya (karakter suara tidak berubah)
+const PRI={'catch-cammon-rare':.95,'catch-epic':1,'catch-legend':1.08,'catch-mytic':1.18,'catch-secret':1.2,[SECRET_OK]:2.4},PK={},PM={},PEAKMODE=new Set(['secret-berhasil-dapat']); // secret-berhasil-dapat.mp3 persis seperti aslinya (normalisasi puncak, karakter suara tidak berubah)
 const SG={thunder:1,'meteor-jatuh':1,splash:.4}; // splash (pelampung nyemplung) dikecilkan
 const DUCK={}; // dimatikan: musik utama TIDAK PERNAH dikecilkan/dipotong oleh suara momen
 const MUSIC=['main','rain-music','storm','meteor','omen','fight','ride','aquarium'];
@@ -42,7 +42,7 @@ function play(n,vol=1,delay=0,fadeOthers=false){const b=SB[n];if(!b)return false
 export function sfx(n,a=0,mut=false){try{sfx_(n,a,mut)}catch(e){console.warn('sfx',e)}}
 function sfx_(n,a,mut){if(!on.sound||!ctx())return;
  if(n==='catch'){const ix=Math.max(0,Math.min(6,a)),k=CATCH[ix],loud=ix>=5||(ix===4&&mut);play(k,loud?LOUD:1,0,true);return}
- if(n==='secretok'){play(SECRET_OK,LOUD,0,true);return}
+ if(n==='secretok'){play(SECRET_OK,1,0,true);return}
  const f=SFX[n];if(f)play(f)}
 function applyVol(){if(!started)return;const T=ac.currentTime;
  for(const k in TR)TR[k].g.gain.setTargetAtTime(TR[k].k===curKey&&on.music?1:0,T,XF);
