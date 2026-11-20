@@ -4,7 +4,7 @@ let ac,master,sfxG,ambG,musG,reelG,duckG,priG,started=false,scene='game',mood='c
 const BASE=((import.meta.env&&import.meta.env.BASE_URL)||'/')+'audio/',EXT='.mp3';
 const VOL={music:.6,amb:.6,sfx:1,reel:.45};
 // Level target suara momen (RMS, linear). Musik utama (main) sekitar -21 dB; efek dibuat jelas terdengar, sedikit di bawah/setara musik (-20/-22 dB), semuanya diratakan.
-const RT_PRI=.105,RT_SFX=.1,LOUD=1.3; // LOUD: momen langka (legend bermutasi, mythic, secret) sedikit di atas musik utama
+const RT_PRI=.14,RT_SFX=.1,LOUD=1.3; // LOUD: momen langka (legend bermutasi, mythic, secret) sedikit di atas musik utama
 const FI=.012,FO=.06;            // fade masuk / keluar efek (detik)
 const XF=.18;                    // crossfade musik & ambience (detik): cepat, tidak ada jeda
 // nama efek di kode -> nama file persis di public/audio
@@ -12,7 +12,7 @@ const SFX={cast:'cast',splash:'splash',hook:null,ok:'ok',fail:'fail',miss:'miss'
 const CATCH=['catch-cammon-rare','catch-cammon-rare','catch-cammon-rare','catch-epic','catch-legend','catch-mytic','catch-secret'];
 const SECRET_OK='secret-berhasil-dapat';
 // suara penting (catch & secret): dinormalkan ke puncak penuh lalu dikuatkan, lewat bus sendiri + limiter => lantang
-const PRI={'catch-cammon-rare':.9,'catch-epic':1,'catch-legend':1.05,'catch-mytic':1.1,'catch-secret':1.15,[SECRET_OK]:1.1},PK={};
+const PRI={'catch-cammon-rare':.95,'catch-epic':1,'catch-legend':1.08,'catch-mytic':1.18,'catch-secret':1.35,[SECRET_OK]:1.35},PK={},PM={};
 const SG={thunder:1,'meteor-jatuh':1,splash:.4}; // splash (pelampung nyemplung) dikecilkan
 const DUCK={}; // dimatikan: musik utama TIDAK PERNAH dikecilkan/dipotong oleh suara momen
 const MUSIC=['main','rain-music','storm','meteor','omen','fight','ride','aquarium'];
@@ -28,13 +28,13 @@ function fetchBuf(n){return fetch(BASE+n+EXT).then(r=>{if(!r.ok)throw 0;return r
 function loadAssets(){
  const sfxNames=[...new Set([...Object.values(SFX).filter(Boolean),...CATCH,SECRET_OK])];
  sfxNames.forEach(n=>fetchBuf(n).then(b=>{let m=0,ss=0,cnt=0;for(let c=0;c<b.numberOfChannels;c++){const d=b.getChannelData(c);for(let i=0;i<d.length;i++){const x=d[i],a=Math.abs(x);if(a>m)m=a;ss+=x*x}cnt+=d.length}
-  const rms=Math.sqrt(ss/Math.max(1,cnt));PK[n]=Math.min(20,.98/Math.max(m,.02),(PRI[n]!==undefined?RT_PRI:RT_SFX)/Math.max(rms,.003));SB[n]=b}).catch(()=>{}));
+  const rms=Math.sqrt(ss/Math.max(1,cnt));PM[n]=Math.max(m,.02);PK[n]=Math.min(20,.98/Math.max(m,.02),(PRI[n]!==undefined?RT_PRI:RT_SFX)/Math.max(rms,.003));SB[n]=b}).catch(()=>{}));
  // ambience + suara reel (loop) via buffer agar mulus
  const loop=(n,dest,store)=>fetchBuf(n).then(b=>{const s=ac.createBufferSource(),g=ac.createGain();s.buffer=b;s.loop=true;g.gain.value=0;s.connect(g);g.connect(dest);s.start();store[n]=g;applyVol()}).catch(()=>{});
  setTimeout(()=>{AMB.forEach(n=>loop(n,ambG,AB));loop('fishing-reel',reelG,AB)},500)}
 // efek: masuk cepat, keluar cepat. Efek lama yang masih bunyi lain ikut di-fade supaya tidak numpuk/ada jeda
 function play(n,vol=1,delay=0,fadeOthers=false){const b=SB[n];if(!b)return false;const T=ac.currentTime+delay,s=ac.createBufferSource(),g=ac.createGain(),d=b.duration;
- s.buffer=b;const pri=PRI[n]!==undefined,v=vol*(PK[n]||1)*(pri?PRI[n]:(SG[n]??1))*(pri?1:VOL.sfx);g.gain.setValueAtTime(0,T);g.gain.linearRampToValueAtTime(v,T+FI);
+ s.buffer=b;const pri=PRI[n]!==undefined;let v=vol*(PK[n]||1)*(pri?PRI[n]:(SG[n]??1))*(pri?1:VOL.sfx);if(pri)v=Math.min(v,1.15/PM[n]); // batas puncak: keras tapi tidak pecahg.gain.setValueAtTime(0,T);g.gain.linearRampToValueAtTime(v,T+FI);
  const fo=Math.min(FO,d*.3);g.gain.setValueAtTime(v,Math.max(T+FI,T+d-fo));g.gain.linearRampToValueAtTime(0,T+d);
  if(fadeOthers)live.forEach(o=>{try{o.g.gain.cancelScheduledValues(T);o.g.gain.setValueAtTime(o.g.gain.value,T);o.g.gain.linearRampToValueAtTime(0,T+FO);o.s.stop(T+FO+.01)}catch{}});
  if(DUCK[n]!==undefined){const dg=duckG.gain;dg.cancelScheduledValues(T);dg.setTargetAtTime(DUCK[n],T,.03);dg.setTargetAtTime(1,T+d*.85,.25)}
