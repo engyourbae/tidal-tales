@@ -3,8 +3,8 @@
 let ac,master,sfxG,ambG,musG,reelG,duckG,priG,started=false,scene='game',mood='clear',tod='siang',depth=0,curKey=null,on={sound:true,music:true};
 const BASE=((import.meta.env&&import.meta.env.BASE_URL)||'/')+'audio/',EXT='.mp3';
 const VOL={music:.6,amb:.5,sfx:1,reel:.4};
-// Level target suara momen (RMS, linear). Musik utama (main) sekitar -21 dB; efek sengaja SEDIKIT di bawahnya (-24/-26 dB) dan semuanya diratakan.
-const RT_PRI=.063,RT_SFX=.05;
+// Level target suara momen (RMS, linear). Musik utama (main) sekitar -21 dB; efek dibuat jelas terdengar, sedikit di bawah/setara musik (-20/-22 dB), semuanya diratakan.
+const RT_PRI=.095,RT_SFX=.08;
 const FI=.012,FO=.06;            // fade masuk / keluar efek (detik)
 const XF=.18;                    // crossfade musik & ambience (detik): cepat, tidak ada jeda
 // nama efek di kode -> nama file persis di public/audio
@@ -13,7 +13,7 @@ const CATCH=['catch-cammon-rare','catch-cammon-rare','catch-cammon-rare','catch-
 const SECRET_OK='secret-berhasil-dapat';
 // suara penting (catch & secret): dinormalkan ke puncak penuh lalu dikuatkan, lewat bus sendiri + limiter => lantang
 const PRI={'catch-cammon-rare':.9,'catch-epic':1,'catch-legend':1.05,'catch-mytic':1.1,'catch-secret':1.15,[SECRET_OK]:1.1},PK={};
-const SG={thunder:.9,'meteor-jatuh':.9};
+const SG={thunder:1,'meteor-jatuh':1};
 const DUCK={}; // dimatikan: musik utama TIDAK PERNAH dikecilkan/dipotong oleh suara momen
 const MUSIC=['main','rain-music','storm','meteor','omen','fight','ride','aquarium'];
 const AMB=['waves','rain','wind','night','under'];
